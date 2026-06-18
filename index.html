@@ -697,111 +697,22 @@ textarea.form-control{resize:vertical;min-height:80px}
 // CONFIG — Thay URL Google Apps Script vào đây sau khi deploy
 // ============================================================
 const CONFIG = {
-  APPS_SCRIPT_URL: '', // https://script.google.com/macros/s/YOUR_ID/exec
-  SHEET_ID: '',        // Google Sheet ID
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwSkj17nJRUxGjJHdkkTMjCR8zrKbRAn-qYmUZ2dt34C1ek5kBHHHb1gBuIjSrgbPT1mg/exec',
 };
 
 // ============================================================
 // DATA
 // ============================================================
-const COUNTRIES = [
-  {code:'US',name:'Mỹ (USA / Mỹ Kỳ)',flag:'🇺🇸',zone:'US'},
-  {code:'CA',name:'Canada',flag:'🇨🇦',zone:'CA'},
-  {code:'GB',name:'Anh Quốc (UK)',flag:'🇬🇧',zone:'EU'},
-  {code:'DE',name:'Đức (Germany)',flag:'🇩🇪',zone:'EU'},
-  {code:'FR',name:'Pháp (France)',flag:'🇫🇷',zone:'EU'},
-  {code:'IT',name:'Ý (Italy)',flag:'🇮🇹',zone:'EU'},
-  {code:'ES',name:'Tây Ban Nha (Spain)',flag:'🇪🇸',zone:'EU'},
-  {code:'NL',name:'Hà Lan (Netherlands)',flag:'🇳🇱',zone:'EU'},
-  {code:'PL',name:'Ba Lan (Poland)',flag:'🇵🇱',zone:'EU'},
-  {code:'AU',name:'Úc (Australia)',flag:'🇦🇺',zone:'AU'},
-  {code:'NZ',name:'New Zealand',flag:'🇳🇿',zone:'AU'},
-  {code:'JP',name:'Nhật Bản (Japan)',flag:'🇯🇵',zone:'AS1'},
-  {code:'KR',name:'Hàn Quốc (Korea)',flag:'🇰🇷',zone:'AS1'},
-  {code:'HK',name:'Hồng Kông (HK)',flag:'🇭🇰',zone:'AS1'},
-  {code:'TW',name:'Đài Loan (Taiwan)',flag:'🇹🇼',zone:'AS1'},
-  {code:'SG',name:'Singapore',flag:'🇸🇬',zone:'AS2'},
-  {code:'TH',name:'Thái Lan (Thailand)',flag:'🇹🇭',zone:'AS2'},
-  {code:'MY',name:'Malaysia',flag:'🇲🇾',zone:'AS2'},
-  {code:'ID',name:'Indonesia',flag:'🇮🇩',zone:'AS2'},
-  {code:'PH',name:'Philippines',flag:'🇵🇭',zone:'AS2'},
-  {code:'IN',name:'Ấn Độ (India)',flag:'🇮🇳',zone:'AS3'},
-  {code:'AE',name:'UAE (Dubai)',flag:'🇦🇪',zone:'ME'},
-  {code:'SA',name:'Ả Rập Saudi',flag:'🇸🇦',zone:'ME'},
-  {code:'KW',name:'Kuwait',flag:'🇰🇼',zone:'ME'},
-  {code:'CN',name:'Trung Quốc (China)',flag:'🇨🇳',zone:'CN'},
-];
-
-// Rates VND/kg (chargeable weight), minimum 0.5kg applied
-const RATES = {
-  US: {
-    chuyentyen:  {base:408000, min:0.5, transit:'7-14 ngày làlàm việc', features:['Giá tốt nhất','Chuyên tuyến đặc biệt','Hàng nguyên kiện']},
-    viettelpost: {base:567000, min:0.5, transit:'5-7 ngày làm việc',    features:['Đối tác chiến lược','Bảo hiểm tích hợp']},
-    ems:         {base:594000, min:0.5, transit:'5-7 ngày làm việc',    features:['Hãng bưu chính quốc gia','Uy tín cao']},
-    dhl:         {base:640000, min:0.5, transit:'3-5 ngày làm việc',    features:['Nhanh nhất','Door-to-door','Track real-time']},
-    fedex:       {base:613000, min:0.5, transit:'3-5 ngày làm việc',    features:['International Priority','Bảo đảm thời gian']},
-    ups:         {base:607000, min:0.5, transit:'4-6 ngày làm việc',    features:['Worldwide Express','Đáng tin cậy']},
-  },
-  CA: {
-    chuyentyen:  {base:420000,min:0.5,transit:'7-14 ngày',features:['Giá tốt nhất','Chuyên tuyến']},
-    dhl:         {base:660000,min:0.5,transit:'3-5 ngày',features:['Door-to-door','Real-time tracking']},
-    fedex:       {base:630000,min:0.5,transit:'3-5 ngày',features:['International Priority']},
-    ups:         {base:620000,min:0.5,transit:'4-6 ngày',features:['Worldwide Express']},
-  },
-  EU: {
-    chuyentyen:  {base:380000,min:0.5,transit:'5-10 ngày',features:['Giá tốt nhất','Bay thẳng châu Âu']},
-    viettelpost: {base:510000,min:0.5,transit:'5-7 ngày',features:['Bảo hiểm tích hợp']},
-    dhl:         {base:580000,min:0.5,transit:'2-4 ngày',features:['Express','Door-to-door']},
-    fedex:       {base:560000,min:0.5,transit:'2-4 ngày',features:['International Priority']},
-    ups:         {base:550000,min:0.5,transit:'3-5 ngày',features:['Worldwide Expedited']},
-  },
-  AU: {
-    chuyentyen:  {base:350000,min:0.5,transit:'5-9 ngày',features:['Giá tốt nhất','Chuyên tuyến Úc']},
-    dhl:         {base:500000,min:0.5,transit:'3-5 ngày',features:['Express','Real-time tracking']},
-    fedex:       {base:480000,min:0.5,transit:'3-5 ngày',features:['International Priority']},
-    ups:         {base:470000,min:0.5,transit:'4-6 ngày',features:['Worldwide Express']},
-  },
-  AS1: {
-    chuyentyen:  {base:250000,min:0.5,transit:'3-7 ngày',features:['Giá tốt nhất','Bay thẳng']},
-    viettelpost: {base:360000,min:0.5,transit:'3-5 ngày',features:['Đối tác khu vực']},
-    dhl:         {base:420000,min:0.5,transit:'2-3 ngày',features:['Express']},
-    fedex:       {base:400000,min:0.5,transit:'2-3 ngày',features:['IP Service']},
-    ups:         {base:390000,min:0.5,transit:'2-3 ngày',features:['Express Saver']},
-  },
-  AS2: {
-    chuyentyen:  {base:180000,min:0.5,transit:'2-5 ngày',features:['Giá tốt nhất','ASEAN tuyến đặc biệt']},
-    viettelpost: {base:290000,min:0.5,transit:'2-4 ngày',features:['Đối tác ASEAN']},
-    dhl:         {base:350000,min:0.5,transit:'1-3 ngày',features:['Express']},
-    fedex:       {base:330000,min:0.5,transit:'1-3 ngày',features:['IP Service']},
-    ups:         {base:320000,min:0.5,transit:'2-3 ngày',features:['Worldwide']},
-  },
-  AS3: {
-    chuyentyen:  {base:290000,min:0.5,transit:'5-10 ngày',features:['Giá tốt nhất']},
-    dhl:         {base:480000,min:0.5,transit:'3-5 ngày',features:['Express']},
-    fedex:       {base:460000,min:0.5,transit:'3-5 ngày',features:['IP Service']},
-  },
-  ME: {
-    chuyentyen:  {base:320000,min:0.5,transit:'5-10 ngày',features:['Giá tốt nhất','Trung Đông']},
-    dhl:         {base:520000,min:0.5,transit:'3-5 ngày',features:['Express']},
-    fedex:       {base:500000,min:0.5,transit:'3-5 ngày',features:['IP Service']},
-    ups:         {base:490000,min:0.5,transit:'4-6 ngày',features:['Worldwide']},
-  },
-  CN: {
-    chuyentyen:  {base:150000,min:0.5,transit:'2-4 ngày',features:['Giá tốt nhất','Chuyên tuyến Trung Quốc']},
-    viettelpost: {base:220000,min:0.5,transit:'2-3 ngày',features:['Đối tác']},
-    dhl:         {base:300000,min:0.5,transit:'1-2 ngày',features:['Express']},
-    fedex:       {base:280000,min:0.5,transit:'1-2 ngày',features:['IP']},
-    ups:         {base:270000,min:0.5,transit:'1-2 ngày',features:['Express']},
-  },
-};
+// Countries loaded from API on init
+let COUNTRIES = [];
 
 const SERVICE_INFO = {
-  chuyentyen:  {name:'Chuyên Tuyến Đặc Biệt', icon:'✈️', color:'blue', featured:true},
-  viettelpost: {name:'ViettelPost Logistics', icon:'🟡', color:'orange', featured:false},
-  ems:         {name:'EMS Chuyển Phát Quốc Tế', icon:'📮', color:'green', featured:false},
-  dhl:         {name:'DHL Express Worldwide', icon:'🟡', color:'orange', featured:false},
-  fedex:       {name:'FedEx International', icon:'🟣', color:'blue', featured:false},
-  ups:         {name:'UPS Worldwide Express', icon:'🟤', color:'green', featured:false},
+  'DHL':           {icon:'🟡', color:'orange'},
+  'FedEx IE':      {icon:'🟣', color:'blue'},
+  'FedEx IP':      {icon:'🟣', color:'blue'},
+  'UPS Saver':     {icon:'🟤', color:'green'},
+  'UPS Expedited': {icon:'🟤', color:'green'},
+  'Special Route': {icon:'✈️', color:'blue', featured:true},
 };
 
 // ============================================================
@@ -838,20 +749,20 @@ function renderCountryOptions(list) {
     return;
   }
   dd.innerHTML = list.map(c =>
-    `<div class="country-option" onclick="selectCountry('${c.code}','${c.name}')">
-      ${c.name}
+    `<div class="country-option" onclick="selectCountry(${JSON.stringify(c.country_name)})">
+      ${c.country_name}
     </div>`
   ).join('');
 }
 
-function selectCountry(code, name) {
+function selectCountry(name) {
   document.getElementById('countrySearch').value = name;
-  document.getElementById('selectedCountry').value = code;
+  document.getElementById('selectedCountry').value = name;
   closeCountryDropdown();
   autoCalculate();
 }
 function filterCountries(q) {
-  const filtered = q ? COUNTRIES.filter(c => c.name.toLowerCase().includes(q.toLowerCase())) : COUNTRIES;
+  const filtered = q ? COUNTRIES.filter(c => c.country_name.toLowerCase().includes(q.toLowerCase())) : COUNTRIES;
   renderCountryOptions(filtered);
   document.getElementById('countryDropdown').classList.add('open');
 }
@@ -1051,33 +962,55 @@ function updateRFQWeights() {
 // ============================================================
 // CALCULATE RATES
 // ============================================================
+let _calcAbort = null;
+
 function calculateRates(doScroll = true) {
-  const countryCode = document.getElementById('selectedCountry').value;
-  if (!countryCode) {
-    showToast('Vui lòng chọn quốc gia đến', 'error'); return;
-  }
+  const countryName = document.getElementById('selectedCountry').value;
+  if (!countryName) { showToast('Vui lòng chọn quốc gia đến', 'error'); return; }
+
   const d = getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty');
-  if (d.totalCW === 0) {
-    showToast('Vui lòng nhập trọng lượng hoặc kích thước hàng', 'error'); return;
-  }
+  if (d.totalCW === 0) { showToast('Vui lòng nhập trọng lượng hoặc kích thước hàng', 'error'); return; }
 
-  const country = COUNTRIES.find(c => c.code === countryCode);
-  const zone = country?.zone || 'US';
-  const rateTable = RATES[zone] || RATES['US'];
-  const chargeableKg = Math.max(d.totalCW, 0.5); // minimum 0.5kg
+  const chargeableKg = Math.max(d.totalCW, 0.5);
+  const cargoCode = document.querySelector('#pieces-container .piece-card select.form-control')?.value || 'normal';
 
-  const section = document.getElementById('results-section');
+  const section   = document.getElementById('results-section');
   const container = document.getElementById('service-cards');
   section.style.display = 'block';
   document.getElementById('results-subtitle').textContent =
-    `Từ Việt Nam → ${country?.flag} ${country?.name} · ${d.totalQty} kiện · CW: ${chargeableKg.toFixed(2)} kg`;
-
+    `Từ Việt Nam → ${countryName} · ${d.totalQty} kiện · CW: ${chargeableKg.toFixed(2)} kg`;
   document.getElementById('results-placeholder').style.display = 'none';
 
-  const cards = Object.entries(rateTable).map(([key, rate]) => {
-    const info = SERVICE_INFO[key] || {name:key, icon:'📦', color:'blue', featured:false};
-    const price = Math.ceil(rate.base * chargeableKg / 1000) * 1000;
-    const isFeatured = info.featured;
+  const savedY = window.scrollY;
+  container.innerHTML = '<div class="loading" style="grid-column:1/-1;padding:32px;justify-content:center"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+
+  if (doScroll) section.scrollIntoView({behavior:'smooth', block:'start'});
+  else requestAnimationFrame(() => window.scrollTo({top: savedY, behavior:'instant'}));
+
+  const url = `${CONFIG.APPS_SCRIPT_URL}?action=getRates&country=${encodeURIComponent(countryName)}&cargo_code=${cargoCode}&cw=${chargeableKg}&direction=export`;
+  fetch(url)
+    .then(r => r.json())
+    .then(res => {
+      if (!res.success || !res.data?.rates?.length) {
+        container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Chưa có bảng giá cho quốc gia này. Vui lòng liên hệ nhân viên VNGROW.</div>';
+        return;
+      }
+      renderRateCards(container, res.data.rates, countryName, chargeableKg, savedY, doScroll);
+    })
+    .catch(() => {
+      container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Không thể tải bảng giá. Vui lòng thử lại.</div>';
+    });
+}
+
+function renderRateCards(container, rates, countryName, cw, savedY, doScroll) {
+  const cards = rates.map((r, idx) => {
+    const info = SERVICE_INFO[r.service] || {icon:'📦', color:'blue', featured:false};
+    const isFeatured = info.featured || idx === 0;
+    const transitText = r.transit_min && r.transit_max
+      ? `${r.transit_min}–${r.transit_max} ngày làm việc`
+      : '';
+    const safeName = r.service.replace(/'/g, "\\'");
+    const safeCountry = countryName.replace(/'/g, "\\'");
     return `
       <div class="service-card ${isFeatured?'featured':''}">
         ${isFeatured ? '<div class="sc-badge">⭐ GIÁ TỐT NHẤT</div>' : ''}
@@ -1085,20 +1018,23 @@ function calculateRates(doScroll = true) {
           <div class="sc-header">
             <div class="sc-logo">${info.icon}</div>
             <div>
-              <div class="sc-name">${info.name}</div>
-              <div class="sc-sub">🕐 ${rate.transit}</div>
+              <div class="sc-name">${r.service}</div>
+              ${transitText ? `<div class="sc-sub">🕐 ${transitText}</div>` : ''}
             </div>
           </div>
-          <div class="sc-price">${formatVND(price)}</div>
-          <div class="sc-price-note">Nền cước + Xăng dầu + Thuế VAT · CW ${chargeableKg.toFixed(2)} kg</div>
-          <div class="sc-tags">
-            ${rate.features.map(f => `<span class="sc-tag ${info.color}">${f}</span>`).join('')}
+          <div class="sc-price">${formatVND(r.total)}</div>
+          <div class="sc-price-note">
+            Cước ${formatVND(r.freight)} + Xăng dầu ${r.fuel_pct}%
+            ${r.vat_pct > 0 ? ` + VAT ${r.vat_pct}%` : ' + VAT 0%'}
+            · CW ${cw.toFixed(2)} kg
           </div>
           <div class="sc-footer">
-            <button class="btn btn-outline btn-sm" onclick='openConfirmModal("${key}","${info.name}",${price},"${country?.name}",${chargeableKg})'>
+            <button class="btn btn-outline btn-sm"
+              onclick='openConfirmModal("${safeName}","${safeName}",${r.total},"${safeCountry}",${cw})'>
               Xác nhận báo giá
             </button>
-            <button class="btn btn-primary btn-sm" onclick='openBookingModal("${key}","${info.name}",${price},"${country?.name}","${country?.flag}",${chargeableKg})'>
+            <button class="btn btn-primary btn-sm"
+              onclick='openBookingModal("${safeName}","${safeName}",${r.total},"${safeCountry}","",${cw})'>
               📦 Booking
             </button>
           </div>
@@ -1106,13 +1042,8 @@ function calculateRates(doScroll = true) {
       </div>`;
   }).join('');
 
-  const savedY = window.scrollY;
   container.innerHTML = cards;
-  if (doScroll) {
-    section.scrollIntoView({behavior:'smooth', block:'start'});
-  } else {
-    requestAnimationFrame(() => window.scrollTo({top: savedY, behavior: 'instant'}));
-  }
+  if (!doScroll) requestAnimationFrame(() => window.scrollTo({top: savedY, behavior:'instant'}));
 }
 
 function resetPricing() {
@@ -1230,7 +1161,28 @@ function submitBooking() {
     ...currentQuote,
     timestamp: new Date().toISOString()
   };
-  sendToSheet('booking', data);
+  apiPost({
+    action: 'submitBooking',
+    service:             currentQuote.serviceKey || currentQuote.serviceName || '',
+    direction:           'export',
+    origin_country:      'Việt Nam',
+    destination_country: currentQuote.country || '',
+    creator_name:        get('bk-name'),
+    creator_phone:       get('bk-phone'),
+    creator_email:       get('bk-email'),
+    creator_company:     get('bk-company'),
+    sender_name:         get('bk-sender-name'),
+    sender_phone:        get('bk-sender-phone'),
+    sender_address:      get('bk-sender-address'),
+    receiver_name:       get('bk-recv-name'),
+    receiver_phone:      get('bk-recv-phone'),
+    receiver_address:    get('bk-recv-address'),
+    receiver_country:    get('bk-recv-country'),
+    total_packages:      document.querySelectorAll('#pieces-container .piece-card').length,
+    total_gw:            parseFloat(document.getElementById('ws-gw')?.textContent) || 0,
+    total_cw:            currentQuote.cw || 0,
+    package_details:     document.getElementById('bk-pkg-list')?.innerText || '',
+  });
   closeModal('modal-booking');
   showToast('🎉 Đặt hàng thành công! Nhân viên sẽ xác nhận trong 30 phút.', 'success');
 }
@@ -1318,19 +1270,41 @@ function doTracking() {
   res.innerHTML = '<div class="loading"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
   document.getElementById('tracking-samples').style.display = 'none';
 
-  setTimeout(() => {
-    const data = DEMO_TRACKING[code];
-    if (data) {
-      renderTrackingResult(data);
-    } else if (CONFIG.APPS_SCRIPT_URL) {
-      fetchFromSheet('tracking', code).then(d => {
-        if (d) renderTrackingResult(d);
-        else showTrackingNotFound(code);
-      }).catch(() => showTrackingNotFound(code));
-    } else {
-      showTrackingNotFound(code);
-    }
-  }, 800);
+  // Try demo data first, then fall through to API
+  const demo = DEMO_TRACKING[code];
+  if (demo) { setTimeout(() => renderTrackingResult(demo), 600); return; }
+
+  // Call real API
+  const url = `${CONFIG.APPS_SCRIPT_URL}?action=tracking&id=${encodeURIComponent(code)}`;
+  fetch(url)
+    .then(r => r.json())
+    .then(res => {
+      if (!res.success || !res.data?.shipment) { showTrackingNotFound(code); return; }
+      const s = res.data.shipment;
+      const tl = (res.data.timeline || []).map((t, i, arr) => ({
+        done:   i < arr.length - 1,
+        active: i === arr.length - 1,
+        title:  t.status,
+        date:   t.timestamp ? new Date(t.timestamp).toLocaleString('vi-VN') : '',
+        loc:    t.location || '',
+      }));
+      renderTrackingResult({
+        trackingNo:  s.id_shipment,
+        service:     s.service,
+        origin:      'Việt Nam',
+        dest:        `${s.receiver_name} – ${s.receiver_country}`,
+        weight:      s.total_cw ? `${s.total_cw} kg` : '',
+        status:      mapStatus(s.current_status),
+        statusText:  s.current_status,
+        pieces:      s.total_pieces || 1,
+        created:     s.created_date ? new Date(s.created_date).toLocaleDateString('vi-VN') : '',
+        eta:         s.eta_date    ? new Date(s.eta_date).toLocaleDateString('vi-VN') : 'Đang cập nhật',
+        sender:      {name: s.sender_name,   address: s.sender_address},
+        receiver:    {name: s.receiver_name, address: s.receiver_address},
+        timeline:    tl,
+      });
+    })
+    .catch(() => showTrackingNotFound(code));
 }
 
 function demoTrack(code) {
@@ -1405,6 +1379,13 @@ function showTrackingNotFound(code) {
   document.getElementById('tracking-samples').style.display = 'block';
 }
 
+function mapStatus(s) {
+  if (!s) return 'in_transit';
+  if (s.includes('Đã giao')) return 'delivered';
+  if (s.includes('hải quan') || s.includes('thủ tục')) return 'customs';
+  return 'in_transit';
+}
+
 function resetTracking() {
   document.getElementById('tracking-result').innerHTML = '';
   document.getElementById('tracking-samples').style.display = 'block';
@@ -1468,12 +1449,20 @@ function submitRFQ(e) {
     });
   });
 
-  sendToSheet('rfq', {
-    ...data,
-    pieces: items,
-    totalCW: d.totalCW,
-    filesCount: selectedFiles.length,
-    timestamp: new Date().toISOString()
+  apiPost({
+    action: 'submitRFQ',
+    contact_name:    data['contact-name']    || data.contact_name    || '',
+    contact_phone:   data['contact-phone']   || data.contact_phone   || '',
+    contact_email:   data['contact-email']   || data.contact_email   || '',
+    contact_company: data['contact-company'] || data.contact_company || '',
+    direction:       document.querySelector('.dir-btn.active')?.dataset?.dir || 'export',
+    origin_country:  'Việt Nam',
+    destination_country: data['dest-country'] || data.destination_country || '',
+    cargo_group:     items[0]?.cargo_code || 'normal',
+    cargo_description: items.map(i => `${i.name} (${i.gw}kg, ${i.l}x${i.w}x${i.h}cm x${i.qty})`).join('; '),
+    total_packages:  d.totalQty,
+    total_gw:        d.totalGW.toFixed(2),
+    special_requirements: data.special_requirements || data['special-req'] || '',
   });
 
   form.innerHTML = `
@@ -1489,23 +1478,27 @@ function submitRFQ(e) {
 }
 
 // ============================================================
-// GOOGLE SHEETS INTEGRATION
+// API HELPERS
 // ============================================================
-async function sendToSheet(action, data) {
+async function apiPost(data) {
   if (!CONFIG.APPS_SCRIPT_URL) return;
   try {
     await fetch(CONFIG.APPS_SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({action, ...data}),
+      body: JSON.stringify(data),
     });
-  } catch(err) { console.warn('Sheet sync failed:', err); }
+  } catch(err) { console.warn('API error:', err); }
 }
 
-async function fetchFromSheet(action, query) {
-  if (!CONFIG.APPS_SCRIPT_URL) return null;
-  const url = `${CONFIG.APPS_SCRIPT_URL}?action=${action}&query=${encodeURIComponent(query)}`;
-  const r = await fetch(url);
-  return r.ok ? r.json() : null;
+async function loadCountries() {
+  try {
+    const r   = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getCountries`);
+    const res = await r.json();
+    if (res.success && res.data?.length) {
+      COUNTRIES = res.data;
+      renderCountryOptions(COUNTRIES);
+    }
+  } catch(err) { console.warn('Could not load countries:', err); }
 }
 
 // ============================================================
@@ -1532,6 +1525,7 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 // ============================================================
 addPiece();
 addRFQPiece();
+loadCountries();
 </script>
 </body>
 </html>
