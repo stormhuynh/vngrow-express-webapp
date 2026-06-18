@@ -1449,20 +1449,21 @@ function submitRFQ(e) {
     });
   });
 
+  const dirText = document.querySelector('.dir-btn.active')?.textContent || '';
   apiPost({
-    action: 'submitRFQ',
-    contact_name:    data['contact-name']    || data.contact_name    || '',
-    contact_phone:   data['contact-phone']   || data.contact_phone   || '',
-    contact_email:   data['contact-email']   || data.contact_email   || '',
-    contact_company: data['contact-company'] || data.contact_company || '',
-    direction:       document.querySelector('.dir-btn.active')?.dataset?.dir || 'export',
-    origin_country:  'Việt Nam',
-    destination_country: data['dest-country'] || data.destination_country || '',
-    cargo_group:     items[0]?.cargo_code || 'normal',
-    cargo_description: items.map(i => `${i.name} (${i.gw}kg, ${i.l}x${i.w}x${i.h}cm x${i.qty})`).join('; '),
-    total_packages:  d.totalQty,
-    total_gw:        d.totalGW.toFixed(2),
-    special_requirements: data.special_requirements || data['special-req'] || '',
+    action:              'submitRFQ',
+    contact_name:        data.name    || '',
+    contact_phone:       data.phone   || '',
+    contact_email:       data.email   || '',
+    contact_company:     data.company || '',
+    direction:           dirText.includes('Quốc tế →') ? 'import' : 'export',
+    origin_country:      'Việt Nam',
+    destination_country: data.country || '',
+    cargo_group:         items[0]?.cargo_code || 'normal',
+    cargo_description:   items.map(i => `${i.name} (${i.gw}kg, ${i.l}x${i.w}x${i.h}cm x${i.qty})`).join('; '),
+    total_packages:      d.totalQty,
+    total_gw:            d.totalGW.toFixed(2),
+    special_requirements: data.notes || '',
   });
 
   form.innerHTML = `
