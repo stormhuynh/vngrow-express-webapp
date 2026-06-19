@@ -788,15 +788,15 @@ function addPiece() {
       <button type="button" class="btn-remove" onclick="removePiece(${id})">🗑 Xóa kiện</button>
     </div>
     <div class="piece-top-row" style="margin-bottom:12px">
-      <div class="form-group" style="width:160px;flex-shrink:0">
+      <div class="form-group">
         <label class="form-label">Tên hàng</label>
         <input type="text" class="form-control" placeholder="VD: Hộp hàng 01..." oninput="updateWeights()">
       </div>
-      <div class="form-group" style="width:120px;flex-shrink:0">
+      <div class="form-group" style="width:140px;flex-shrink:0">
         <label class="form-label">HS Code (nếu có)</label>
         <input type="text" class="form-control" placeholder="VD: 6109.10" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" style="letter-spacing:.5px">
       </div>
-      <div class="form-group" style="flex:1;min-width:0">
+      <div class="form-group" style="width:160px;flex-shrink:0">
         <label class="form-label">Nhóm hàng</label>
         <select class="form-control select-sm">
           <option value="normal">Hàng thường (giày dép, quần áo, túi xách...)</option>
