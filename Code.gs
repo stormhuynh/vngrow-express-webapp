@@ -21,7 +21,13 @@ function sheetToObjects(sheetName) {
     .filter(r => r[0] !== '' && r[0] !== null)
     .map(r => {
       const obj = {};
-      headers.forEach((h, i) => { if (h) obj[h] = r[i]; });
+      headers.forEach((h, i) => {
+        if (h) {
+          // Normalize: "FEDEX IE" → "fedex_ie", "UPS Saver" → "ups_saver"
+          const key = String(h).trim().toLowerCase().replace(/\s+/g, '_');
+          obj[key] = r[i];
+        }
+      });
       return obj;
     });
 }
