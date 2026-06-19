@@ -1,5 +1,5 @@
 // ============================================================
-// VNGROW Express Freight — Google Apps Script
+// VNGROW Express Webapp — Google Apps Script
 // Spreadsheet: https://docs.google.com/spreadsheets/d/1lY0wWpwfuuV9GLiQq0ha7UwfQWhYdrf2o205-yLJQGc
 // Deploy: Extensions > Apps Script > Deploy > New deployment > Web App
 //   Execute as: Me | Who has access: Anyone
@@ -127,25 +127,48 @@ function getCargoGroups() {
 // RATE LOOKUP HELPERS
 // ============================================================
 
-// Returns the rate value (number) for a given cargo_code, CW, and zone column header.
-function lookupRate(sheetName, cargoCode, cw, zoneHeader) {
+// Normalize zone value: if user entered "5" → "zone_5", "A" → "zone_A", already "zone_5" → "zone_5"
+function normalizeZone(raw) {
+  if (!raw && raw !== 0) return null;
+  const s = String(raw).trim();
+  if (s === '' || s === '0') return null;
+  if (/^zone_/i.test(s)) return s.toLowerCase();
+  return 'zone_' + s;
+}
+
+// Map cargo_code → cargo_group display name using CONFIG
+function cargoCodeToGroup(cargoCode, cargoGroups) {
+  const found = cargoGroups.find(g => String(g.cargo_code).trim() === String(cargoCode).trim());
+  return found ? String(found.cargo_group).trim() : cargoCode;
+}
+
+// Returns the rate value (number) for a given cargo_group display name, CW, and zone column header.
+function lookupRate(sheetName, cargoGroupName, cw, zoneHeader) {
   const sheet = getSheet(sheetName);
   if (!sheet) return null;
 
+  const zone = normalizeZone(zoneHeader);
+  if (!zone) return null;
+
   const [headers, ...rows] = sheet.getDataRange().getValues();
-  const zoneCol = headers.indexOf(zoneHeader);
+  // Try normalized zone (zone_5, zone_A) first, then raw value (country name for Special Route)
+  let zoneCol = zone
+    ? headers.findIndex(h => String(h).trim().toLowerCase() === zone.toLowerCase())
+    : -1;
+  if (zoneCol === -1) {
+    zoneCol = headers.findIndex(h => String(h).trim().toLowerCase() === String(zoneHeader).trim().toLowerCase());
+  }
   if (zoneCol === -1) return null;
 
-  // Collect rows for this cargo_code with numeric weight
+  // Match by cargo_group name (case-insensitive, trimmed)
   const brackets = rows
-    .filter(r => String(r[0]).trim() === String(cargoCode).trim() && !isNaN(parseFloat(r[1])))
+    .filter(r => String(r[0]).trim().toLowerCase() === cargoGroupName.toLowerCase() && !isNaN(parseFloat(r[1])))
     .map(r => ({ weight: parseFloat(r[1]), rate: Number(r[zoneCol]) }))
     .filter(r => r.rate > 0)
     .sort((a, b) => a.weight - b.weight);
 
   if (brackets.length === 0) return null;
 
-  // First bracket whose weight >= cw; fall back to last bracket
   const match = brackets.find(b => b.weight >= cw) || brackets[brackets.length - 1];
   return match.rate;
 }
@@ -169,7 +192,9 @@ function getRates(params) {
   const countryRow = countries.find(r => r.country_name === country);
   if (!countryRow) return { error: 'Không tìm thấy quốc gia: ' + country };
 
-  const cfg    = getConfig();
+  const cfg        = getConfig();
+  const cargoGroups = getCargoGroups();
+  const cargoGroupName = cargoCodeToGroup(cargoCode, cargoGroups); // "normal" → "Hàng thường"
   const vatPct = cfg.vat[direction] !== undefined ? cfg.vat[direction] : (direction === 'export' ? 8 : 0);
 
   // Standard services
@@ -186,7 +211,7 @@ function getRates(params) {
   for (const svc of SERVICES) {
     if (!svc.zone || svc.zone === '') continue;
 
-    const ratePerKg = lookupRate(svc.sheet, cargoCode, cw, svc.zone);
+    const ratePerKg = lookupRate(svc.sheet, cargoGroupName, cw, svc.zone);
     if (ratePerKg === null) continue;
 
     const fcfg     = cfg.fuel[svc.name] || { fuel_pct: 0, transit_min: 0, transit_max: 0 };
@@ -213,7 +238,7 @@ function getRates(params) {
   }
 
   // Special Route (column header = country name)
-  const srRate = lookupRate('SPECIAL_ROUTE_RATE', cargoCode, cw, country);
+  const srRate = lookupRate('SPECIAL_ROUTE_RATE', cargoGroupName, cw, country);
   if (srRate !== null) {
     const fcfg    = cfg.fuel['Special Route'] || { fuel_pct: 0, transit_min: 10, transit_max: 12 };
     const freight = srRate * cw;
