@@ -320,7 +320,7 @@ textarea.form-control{resize:vertical;min-height:80px}
       <div class="form-group">
         <label class="form-label">Quốc gia đến <span class="req">*</span></label>
         <div class="country-search-wrap">
-          <input type="text" id="countrySearch" class="form-control" placeholder="Tìm quốc gia... VD: Mỹ, Anh, Úc" autocomplete="off" oninput="filterCountries(this.value)" onfocus="openCountryDropdown()" onblur="setTimeout(closeCountryDropdown,200)">
+          <input type="text" id="countrySearch" class="form-control" placeholder="Tìm quốc gia... VD: Mỹ, Anh, Úc" autocomplete="off" oninput="filterCountries(this.value)" onfocus="openCountryDropdown()" onblur="setTimeout(closeCountryDropdown,300)">
           <input type="hidden" id="selectedCountry">
           <div class="country-dropdown" id="countryDropdown"></div>
         </div>
@@ -749,7 +749,7 @@ function renderCountryOptions(list) {
     return;
   }
   dd.innerHTML = list.map(c =>
-    `<div class="country-option" onclick="selectCountry(${JSON.stringify(c.country_name)})">
+    `<div class="country-option" onmousedown="event.preventDefault();selectCountry(${JSON.stringify(c.country_name)})">
       ${c.country_name}
     </div>`
   ).join('');
