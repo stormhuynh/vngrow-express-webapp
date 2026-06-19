@@ -749,7 +749,7 @@ function renderCountryOptions(list) {
     return;
   }
   dd.innerHTML = list.map(c =>
-    `<div class="country-option" onmousedown="event.preventDefault();selectCountry(${JSON.stringify(c.country_name)})">
+    `<div class="country-option" onmousedown="event.preventDefault();selectCountry('${c.country_name.replace(/'/g,"\\'")}')">
       ${c.country_name}
     </div>`
   ).join('');
