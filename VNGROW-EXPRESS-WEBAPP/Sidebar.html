@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1878C8;
+      --blue-d: #1360A8;
+      --orange: #F5A200;
+      --orange-d: #E08A00;
+      --green: #2E7D32;
+      --gray-50: #F8F9FA;
+      --gray-100: #F1F3F5;
+      --gray-200: #E9ECEF;
+      --gray-300: #DEE2E6;
+      --gray-700: #495057;
+      --gray-900: #212529;
+      --white: #fff;
+      --r: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      padding: 14px;
+      background: var(--white);
+      color: var(--gray-900);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .header {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-100);
+    }
+    .header h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--blue-d);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header p {
+      font-size: 11px;
+      color: var(--gray-700);
+      margin-top: 2px;
+    }
+    .form-group {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .form-control {
+      width: 100%;
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--r);
+      padding: 8px 10px;
+      font-size: 12.5px;
+      color: var(--gray-900);
+      background: var(--white);
+      transition: border-color .15s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+    select.form-control {
+      cursor: pointer;
+    }
+    .btn {
+      border: none;
+      border-radius: var(--r);
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all .15s;
+      width: 100%;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: var(--white);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--blue-d);
+    }
+    .btn-green {
+      background: var(--green);
+      color: var(--white);
+    }
+    .btn-green:hover:not(:disabled) {
+      background: #1B5E20;
+    }
+    .btn-ghost {
+      background: none;
+      border: 1.5px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: var(--gray-100);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .loading-container {
+      display: none;
+      text-align: center;
+      padding: 20px 10px;
+      background: var(--gray-50);
+      border-radius: var(--r);
+      margin-top: 14px;
+      border: 1px solid var(--gray-200);
+    }
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(24,120,200,.2);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin-bottom: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .preview-container {
+      display: none;
+      margin-top: 16px;
+    }
+    .preview-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .table-wrap {
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--r);
+      margin-bottom: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    th {
+      background: var(--gray-50);
+      font-weight: 700;
+      color: var(--gray-700);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .badge {
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-blue { background: var(--blue-xl); color: var(--blue-d); }
+    .badge-orange { background: var(--orange-xl); color: var(--orange-d); }
+
+    .toast {
+      padding: 10px 14px;
+      border-radius: var(--r);
+      font-weight: 600;
+      margin-top: 10px;
+      display: none;
+    }
+    .toast.success { background: #E8F5E9; color: var(--green); border: 1px solid #C8E6C9; }
+    .toast.error { background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h3>🤖 VNGROW AI IMPORTER</h3>
+    <p>Tải lên bảng giá gốc của đại lý để tự động tính toán và điền cước phẳng.</p>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Đại lý cung cấp</label>
+    <select class="form-control" id="agent">
+      <option value="Alpha">Alpha HCM</option>
+      <option value="Kango">Kango FWD</option>
+      <option value="Viettel">Viettel Post</option>
+      <option value="SendAir">Send Air</option>
+      <option value="ABGroup">ABGroup</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Hãng / Dịch vụ</label>
+    <select class="form-control" id="carrier">
+      <option value="DHL">DHL Express</option>
+      <option value="FedEx IP">FedEx IP</option>
+      <option value="FedEx IE">FedEx IE</option>
+      <option value="UPS Saver">UPS Saver</option>
+      <option value="UPS Expedited">UPS Expedited</option>
+      <option value="EMS">EMS Bưu Điện</option>
+      <option value="Special Route">Chuyên tuyến (Special Route)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Chiều vận chuyển</label>
+    <select class="form-control" id="direction">
+      <option value="export">Xuất khẩu (export)</option>
+      <option value="import">Nhập khẩu (import)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Quốc gia đích</label>
+    <select class="form-control" id="country">
+      <option value="ALL">Áp dụng cho mọi nước (ALL)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Chọn tệp bảng giá (Excel, PDF, Hình ảnh)</label>
+    <input type="file" id="file" class="form-control" accept=".xlsx,.xls,.pdf,.png,.jpg,.jpeg">
+  </div>
+
+  <button class="btn btn-primary" id="btn-analyze" onclick="analyzeFile()">🔍 Bắt đầu phân tích bằng AI</button>
+
+  <div class="loading-container" id="loading">
+    <div class="spinner"></div>
+    <div style="font-weight:600;font-size:12.5px" id="loading-text">AI đang đọc dữ liệu file...</div>
+    <div style="font-size:11px;color:var(--gray-700);margin-top:4px">Có thể mất 10-15 giây để xử lý</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- PREVIEW GRID -->
+  <div class="preview-container" id="preview-area">
+    <div class="preview-title">
+      <span>📊 KẾT QUẢ XEM TRƯỚC (PREVIEW)</span>
+      <span id="rows-count" class="badge badge-blue">0 dòng</span>
+    </div>
+    <div class="table-wrap">
+      <table id="preview-table">
+        <thead>
+          <tr>
+            <th>Mức cân</th>
+            <th>Cách tính</th>
+            <th>Đơn giá gốc</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be injected here -->
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="cancelPreview()" style="width:35%">Hủy</button>
+      <button class="btn btn-green" onclick="saveRates()" style="width:65%">💾 Xác nhận & Lưu cước</button>
+    </div>
+  </div>
+
+  <script>
+    let parsedRates = [];
+    let countriesList = [];
+
+    // Load countries on startup to populate dropdown
+    window.onload = function() {
+      google.script.run
+        .withSuccessHandler(function(countries) {
+          countriesList = countries;
+          const select = document.getElementById('country');
+          countries.forEach(c => {
+            const name = c.country_name || c.country || '';
+            if (name) {
+              const opt = document.createElement('option');
+              opt.value = name;
+              opt.textContent = name;
+              select.appendChild(opt);
+            }
+          });
+        })
+        .getCountriesList();
+    };
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + type;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    function analyzeFile() {
+      const fileInput = document.getElementById('file');
+      if (!fileInput.files.length) {
+        showToast('Vui lòng chọn tệp bảng giá trước!', 'error');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      document.getElementById('btn-analyze').disabled = true;
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('preview-area').style.display = 'none';
+      document.getElementById('loading-text').textContent = 'Đang đọc tệp tin cục bộ...';
+
+      reader.onload = function(e) {
+        const base64Data = e.target.result.split(',')[1];
+        const mimeType = file.type || 'application/octet-stream';
+        
+        document.getElementById('loading-text').textContent = 'AI đang phân tích & tính toán mốc cân...';
+        
+        const params = {
+          agent: document.getElementById('agent').value,
+          carrier: document.getElementById('carrier').value,
+          direction: document.getElementById('direction').value,
+          country: document.getElementById('country').value
+        };
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            document.getElementById('btn-analyze').disabled = false;
+            document.getElementById('loading').style.display = 'none';
+            
+            if (res.success && res.data && res.data.length) {
+              parsedRates = res.data;
+              showPreview(res.data);
+            } else {
+              showToast(res.error || 'AI không trích xuất được dữ liệu bảng cước. Vui lòng kiểm tra lại file.', 'error');
+            }
+          })
+          .withFailureHandler(function(err) {
+            document.getElementById('btn-analyze').disabled = false;
+            document.getElementById('loading').style.display = 'none';
+            showToast('Lỗi kết nối hệ thống: ' + err.message, 'error');
+          })
+          .analyzeRateSheetWithGemini(base64Data, mimeType, params.agent, params.carrier, params.direction, params.country);
+      };
+
+      reader.onerror = function() {
+        document.getElementById('btn-analyze').disabled = false;
+        document.getElementById('loading').style.display = 'none';
+        showToast('Lỗi đọc file trên máy tính của bạn.', 'error');
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function showPreview(data) {
+      const tbody = document.querySelector('#preview-table tbody');
+      tbody.innerHTML = '';
+      document.getElementById('rows-count').textContent = data.length + ' dòng';
+      
+      data.forEach(r => {
+        const tr = document.createElement('tr');
+        const rangeText = r.weight_min + ' - ' + r.weight_max + ' kg';
+        const typeBadge = r.rate_type === 'flat' ? 'badge-orange' : 'badge-blue';
+        const typeText = r.rate_type === 'flat' ? 'Trọn gói' : '/KG';
+        
+        const rateText = Number(r.cost_rate).toLocaleString('vi-VN') + 'đ';
+        const totalText = r.rate_type === 'flat' 
+          ? rateText 
+          : Number(r.weight_min * r.cost_rate).toLocaleString('vi-VN') + 'đ (min)';
+
+        tr.innerHTML = `
+          <td><strong>${rangeText}</strong></td>
+          <td><span class="badge ${typeBadge}">${typeText}</span></td>
+          <td>${rateText}</td>
+          <td>${totalText}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('preview-area').style.display = 'block';
+      showToast('AI phân tích thành công!', 'success');
+    }
+
+    function cancelPreview() {
+      parsedRates = [];
+      document.getElementById('preview-area').style.display = 'none';
+      document.getElementById('file').value = '';
+    }
+
+    function saveRates() {
+      const btnSave = document.querySelector('.btn-green');
+      btnSave.disabled = true;
+      btnSave.textContent = 'Đang lưu cước...';
+
+      const params = {
+        agent: document.getElementById('agent').value,
+        carrier: document.getElementById('carrier').value,
+        direction: document.getElementById('direction').value,
+        country: document.getElementById('country').value
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btnSave.disabled = false;
+          btnSave.innerHTML = '💾 Xác nhận & Lưu cước';
+          if (res.success) {
+            showToast('✅ Đã lưu bảng giá vào Google Sheets thành công!', 'success');
+            cancelPreview();
+          } else {
+            showToast(res.error || 'Có lỗi khi lưu bảng cước.', 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          btnSave.disabled = false;
+          btnSave.innerHTML = '💾 Xác nhận & Lưu cước';
+          showToast('Lỗi ghi dữ liệu: ' + err.message, 'error');
+        })
+        .writeRatesToSheet(parsedRates, params.agent, params.carrier, params.direction, params.country);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VNGROW Express Freight</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* VNGROW Brand Colors */
+  --blue: #1878C8;
+  --blue-l: #2186D6;
+  --blue-xl: #EBF5FD;
+  --blue-d: #1360A8;
+  --green: #2E7D32;
+  --green-l: #43A047;
+  --green-xl: #E8F5E9;
+  --orange: #F5A200;
+  --orange-l: #F8B800;
+  --orange-xl: #FFF8E6;
+  --orange-dark: #E08A00;
+  --gray-50: #F8F9FA;
+  --gray-100: #F1F3F5;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-400: #CED4DA;
+  --gray-500: #ADB5BD;
+  --gray-600: #6C757D;
+  --gray-700: #495057;
+  --gray-800: #343A40;
+  --gray-900: #212529;
+  --white: #fff;
+  --shadow: 0 4px 12px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.03);
+  --shadow-lg: 0 12px 30px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.04);
+  --r: 10px;
+  --r-lg: 16px;
+  --brand-gradient: linear-gradient(135deg, #1360A8 0%, #1878C8 50%, #2186D6 100%);
+  --brand-orange-gradient: linear-gradient(135deg, #E08A00 0%, #F5A200 60%, #F8B800 100%);
+}
+* {box-sizing:border-box;margin:0;padding:0}
+body {font-family:'Inter',sans-serif;background:#F4F7F9;color:var(--gray-900);min-height:100vh;padding-bottom:60px}
+a {color:inherit;text-decoration:none}
+button {cursor:pointer;font-family:inherit;outline:none}
+input,select,textarea {font-family:inherit;outline:none}
+
+/* HEADER */
+.header {background:#fff;color:var(--gray-900);padding:0 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.05)}
+.header-inner {max-width:960px;margin:0 auto;display:flex;align-items:center;gap:12px;height:56px}
+.logo {display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none}
+.logo-img {height:36px;width:auto}
+.logo-divider {width:1px;height:28px;background:var(--gray-200)}
+.logo-tagline {font-size:10px;color:var(--gray-500);font-weight:600;letter-spacing:.5px;line-height:1.3}
+
+/* NAV TABS */
+.nav-tabs {display:flex;gap:6px;margin-left:auto}
+.nav-tab {padding:8px 16px;border-radius:24px;border:none;background:transparent;color:var(--gray-600);font-size:13px;font-weight:600;transition:.25s;white-space:nowrap;cursor:pointer}
+.nav-tab.active {background:var(--orange);color:#fff;box-shadow:0 3px 12px rgba(245,162,0,.3)}
+.nav-tab:hover:not(.active) {background:var(--gray-100);color:var(--gray-900)}
+
+/* MAIN */
+.main {max-width:960px;margin:0 auto;padding:16px 12px}
+.tab-content {display:none}
+.tab-content.active {display:block}
+
+/* CARDS */
+.card {background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);padding:18px;margin-bottom:16px;border:1px solid rgba(0,0,0,.03);transition:transform 0.2s, box-shadow 0.2s}
+.card-title {font-size:13px;font-weight:800;color:var(--gray-800);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px;border-left:3px solid var(--blue);padding-left:8px}
+
+/* FORM */
+.form-row {display:grid;gap:10px;margin-bottom:10px}
+.form-row.cols-2 {grid-template-columns:1fr 1fr}
+.form-row.cols-3 {grid-template-columns:1fr 1fr 1fr}
+.form-row.cols-4 {grid-template-columns:1fr 1fr 1fr 1fr}
+.form-group {display:flex;flex-direction:column;gap:4px}
+.form-label {font-size:11px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.4px}
+.form-label .req {color:var(--orange)}
+.form-control {border:1.5px solid var(--gray-300);border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--gray-900);transition:.2s;background:#fff;width:100%}
+.form-control:focus {outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,120,200,.12)}
+.form-control::placeholder {color:var(--gray-400)}
+select.form-control {cursor:pointer}
+textarea.form-control {resize:vertical;min-height:90px}
+
+/* COUNTRY SELECTOR */
+.country-search-wrap {position:relative}
+.country-dropdown {position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1.5px solid var(--blue);border-radius:var(--r);max-height:260px;overflow-y:auto;z-index:200;box-shadow:var(--shadow-lg);display:none}
+.country-dropdown.open {display:block}
+.country-option {padding:11px 15px;cursor:pointer;font-size:13.5px;display:flex;align-items:center;gap:8px;transition:.15s;border-bottom:1px solid var(--gray-100)}
+.country-option:last-child {border-bottom:none}
+.country-option:hover {background:var(--blue-xl)}
+
+/* PIECE CARD */
+.piece-card {border:1.5px solid var(--gray-200);border-radius:var(--r-lg);padding:16px;margin-bottom:12px;position:relative;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.02);transition:border-color .2s}
+.piece-card:hover {border-color:var(--blue-l)}
+.piece-header {display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.piece-num {font-size:13px;font-weight:900;color:var(--blue);background:var(--blue-xl);padding:3px 10px;border-radius:12px}
+.btn-remove {display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1.5px solid #FFCDD2;color:#e53935;border-radius:var(--r);padding:6px 14px;font-size:12px;font-weight:700;transition:.2s}
+.btn-remove:hover {background:#e53935;color:#fff;border-color:#e53935}
+.dim-row {display:grid;grid-template-columns:1fr 1fr 1fr 1fr 76px;gap:0;border:1.5px solid var(--gray-200);border-radius:var(--r);overflow:hidden}
+.dim-row .form-group {border-right:1.5px solid var(--gray-200);padding:0}
+.dim-row .form-group:last-child {border-right:none}
+.dim-row .form-label {font-size:10px;font-weight:800;color:var(--gray-500);padding:6px 10px 0;letter-spacing:.3px}
+.dim-row .form-control {border:none;border-radius:0;padding:6px 10px 8px;font-size:13px;font-weight:600;color:var(--gray-900);background:#fff}
+.dim-row .form-control:focus {box-shadow:none;background:var(--blue-xl)}
+.dim-row .piece-qty {color:var(--blue);font-weight:800}
+.pieces-section-header {display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pieces-section-label {font-size:13px;font-weight:800;color:var(--gray-700);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.piece-top-row {display:flex;gap:12px;align-items:flex-start}
+.piece-top-row .form-group:first-child {flex:1 1 240px;min-width:0}
+.piece-top-row .form-group:nth-child(3) {min-width:240px}
+.select-sm {padding:9px 12px;font-size:13px}
+
+@media(max-width:640px){
+  .piece-top-row {flex-wrap:wrap}
+  .piece-top-row .form-group:first-child {width:100%;flex:unset}
+  .piece-top-row .form-group:nth-child(2) {width:38%!important;flex-shrink:0}
+  .piece-top-row .form-group:nth-child(3) {width:calc(62% - 12px)!important;min-width:0;flex-shrink:0}
+}
+
+/* WEIGHT SUMMARY */
+.weight-summary {display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:var(--brand-gradient);border-radius:var(--r-lg);padding:18px;color:#fff;margin-top:6px;box-shadow:0 6px 16px rgba(24,120,200,.2)}
+.ws-item {text-align:center}
+.ws-label {font-size:11px;opacity:.85;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.ws-value {font-size:22px;font-weight:900}
+.ws-unit {font-size:11px;opacity:.75}
+.ws-item.highlight {background:rgba(255,255,255,0.15);border-radius:var(--r);padding:8px 4px;border:1.5px solid rgba(255,255,255,0.25)}
+.ws-item.highlight .ws-value {color:#FFF}
+
+/* BUTTONS */
+.btn {border:none;border-radius:var(--r);padding:10px 20px;font-size:13px;font-weight:700;transition:.2s;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn-primary {background:var(--blue);color:#fff;box-shadow:0 3px 8px rgba(24,120,200,.25)}
+.btn-primary:hover:not(:disabled) {background:var(--blue-d);transform:translateY(-1px)}
+.btn-orange {background:var(--brand-orange-gradient);color:#fff;box-shadow:0 3px 10px rgba(245,162,0,.25)}
+.btn-orange:hover:not(:disabled) {background:var(--orange-dark);transform:translateY(-1px)}
+.btn-green {background:var(--green);color:#fff}
+.btn-green:hover:not(:disabled) {background:#1B5E20}
+.btn-outline {background:#fff;color:var(--blue);border:1.5px solid var(--blue);box-shadow:0 2px 6px rgba(24,120,200,.05)}
+.btn-outline:hover:not(:disabled) {background:var(--blue-xl)}
+.btn-ghost {background:none;border:1.5px solid var(--gray-300);color:var(--gray-700)}
+.btn-ghost:hover:not(:disabled) {background:var(--gray-100)}
+.btn-lg {padding:13px 26px;font-size:14.5px;border-radius:var(--r-lg)}
+.btn-full {width:100%;justify-content:center}
+.btn-sm {padding:8px 16px;font-size:12px}
+.btn:disabled {opacity:0.6;cursor:not-allowed}
+
+/* ADD PIECE BTN */
+.btn-add-piece {display:flex;align-items:center;gap:6px;padding:9px 18px;border:none;border-radius:var(--r);color:#fff;background:var(--blue);font-size:13px;font-weight:700;transition:.2s}
+.btn-add-piece:hover {background:var(--blue-d)}
+
+/* RESULTS */
+.results-header {display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.results-title {font-size:14px;font-weight:800;color:var(--gray-800);letter-spacing:.3px}
+.results-sub {font-size:12.5px;color:var(--gray-500);margin-top:4px;font-weight:500}
+.service-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+/* SERVICE CARD */
+.service-card {background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);border:2px solid transparent;transition:all .25s;overflow:hidden;position:relative}
+.service-card:hover {border-color:var(--blue);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.service-card.featured {border-color:var(--orange);box-shadow:0 8px 24px rgba(245,162,0,.15)}
+.sc-badge {background:var(--brand-orange-gradient);color:#fff;font-size:10px;font-weight:800;padding:5px 12px;text-align:center;letter-spacing:.8px;text-transform:uppercase}
+.sc-body {padding:18px}
+.sc-header {display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.sc-logo {width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.sc-name {font-weight:800;font-size:15px;color:var(--gray-900)}
+.sc-sub {font-size:12px;color:var(--gray-500);font-weight:500;margin-top:2px}
+.sc-price {font-size:26px;font-weight:900;color:var(--blue);margin-bottom:4px}
+.sc-price-note {font-size:11.5px;color:var(--gray-500);margin-bottom:14px;line-height:1.5;background:var(--gray-50);padding:8px 10px;border-radius:8px}
+.sc-footer {display:flex;gap:10px}
+.sc-footer .btn {flex:1;justify-content:center}
+
+/* TRACKING */
+.tracking-hero {background:linear-gradient(135deg, #1360A8 0%, #1878C8 50%, #F5A200 100%);border-radius:var(--r-lg);padding:32px 24px;text-align:center;color:#fff;margin-bottom:16px;box-shadow:0 8px 24px rgba(24,120,200,.15)}
+.tracking-hero h2 {font-size:22px;font-weight:900;margin-bottom:8px;letter-spacing:.3px}
+.tracking-hero p {font-size:13.5px;opacity:.9;margin-bottom:24px;font-weight:500}
+.tracking-search {display:flex;gap:10px;max-width:580px;margin:0 auto;background:rgba(255,255,255,0.15);padding:6px;border-radius:14px;backdrop-filter:blur(8px)}
+.tracking-search input {flex:1;border:none;border-radius:var(--r);padding:14px 18px;font-size:15px;font-weight:600;color:var(--gray-900);box-shadow:var(--shadow)}
+.tracking-search input:focus {outline:none}
+
+/* TRACKING RESULT */
+.track-info-bar {display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;background:var(--blue-xl);border-radius:var(--r);padding:14px;margin-bottom:16px}
+.tib-item label {font-size:11px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.tib-item p {font-size:13.5px;font-weight:700;color:var(--gray-900);margin-top:3px}
+.timeline {position:relative;padding-left:32px}
+.timeline::before {content:'';position:absolute;left:10px;top:10px;bottom:10px;width:3px;background:var(--gray-200)}
+.tl-item {position:relative;margin-bottom:18px}
+.tl-dot {position:absolute;left:-28px;width:20px;height:20px;border-radius:50%;border:4px solid var(--gray-300);background:#fff;top:2px;transition:.25s}
+.tl-item.done .tl-dot {border-color:var(--green);background:var(--green)}
+.tl-item.active .tl-dot {border-color:var(--blue);background:var(--blue);box-shadow:0 0 0 5px var(--blue-xl);animation:pulse 2s infinite}
+@keyframes pulse {
+  0% {box-shadow: 0 0 0 0 rgba(24,120,200,0.4)}
+  70% {box-shadow: 0 0 0 8px rgba(24,120,200,0)}
+  100% {box-shadow: 0 0 0 0 rgba(24,120,200,0)}
+}
+.tl-item.active .tl-title {color:var(--blue);font-weight:800}
+.tl-title {font-size:13.5px;font-weight:700;color:var(--gray-800);line-height:1.4}
+.tl-meta {font-size:12px;color:var(--gray-500);margin-top:3px;font-weight:500}
+.tl-loc {font-size:12px;color:var(--gray-600);margin-top:2px;font-weight:600}
+
+/* RFQ */
+.rfq-header {background:linear-gradient(135deg, #fff 0%, var(--orange-xl) 100%);border-left:4px solid var(--orange);border-radius:var(--r-lg);padding:18px 22px;margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rfq-header-text h2 {font-size:17px;font-weight:900;color:var(--blue-d);margin-bottom:4px}
+.rfq-header-text p {font-size:13.5px;color:var(--gray-600);font-weight:500}
+.section-title {font-size:12px;font-weight:800;color:var(--gray-700);text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:2px solid var(--gray-100)}
+.direction-toggle {display:flex;gap:10px;margin-bottom:12px}
+.dir-btn {flex:1;padding:12px;border-radius:var(--r);border:1.5px solid var(--gray-300);background:#fff;font-size:13px;font-weight:700;color:var(--gray-600);text-align:center;cursor:pointer;transition:.2s}
+.dir-btn.active {border-color:var(--blue);background:var(--blue-xl);color:var(--blue)}
+
+/* FILE UPLOAD */
+.file-drop {border:2px dashed var(--gray-400);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:.2s;background:var(--gray-50)}
+.file-drop:hover {border-color:var(--blue);background:var(--blue-xl)}
+.file-drop-icon {font-size:36px;margin-bottom:8px}
+.file-drop p {font-size:13.5px;color:var(--blue);font-weight:700}
+.file-drop small {font-size:12px;color:var(--gray-500);margin-top:4px;display:block}
+.file-list {margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.file-item {display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border-radius:var(--r);border:1.5px solid var(--gray-200);font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
+.file-item span {flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.file-item button {color:var(--gray-400);background:none;border:none;font-size:18px;line-height:1;cursor:pointer;transition:.15s}
+.file-item button:hover {color:#e53935}
+
+/* MODAL */
+.modal-overlay {position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:.25s;backdrop-filter:blur(4px)}
+.modal-overlay.open {opacity:1;pointer-events:auto}
+.modal {background:#fff;border-radius:var(--r-lg);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(24px);transition:.25s;box-shadow:var(--shadow-lg)}
+.modal-overlay.open .modal {transform:translateY(0)}
+.modal-header {padding:18px 22px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
+.modal-title {font-size:15px;font-weight:800;color:var(--gray-900)}
+.modal-close {background:none;border:none;font-size:22px;color:var(--gray-400);cursor:pointer;line-height:1;transition:.15s}
+.modal-close:hover {color:var(--gray-700)}
+.modal-body {padding:22px}
+.modal-footer {padding:16px 22px;border-top:1px solid var(--gray-200);display:flex;gap:12px;justify-content:flex-end}
+.rate-summary {background:var(--blue-xl);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.rate-row {display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13.5px}
+.rate-row:last-child {margin-bottom:0;font-weight:800;font-size:15px;color:var(--blue);border-top:1.5px dashed rgba(24,120,200,0.25);padding-top:8px;margin-top:8px}
+.rate-row span:first-child {color:var(--gray-600);font-weight:500}
+
+/* SUCCESS BOX */
+.success-box {text-align:center;padding:32px 20px}
+.success-icon {font-size:64px;margin-bottom:16px}
+.success-box h3 {font-size:20px;font-weight:900;color:var(--green);margin-bottom:10px}
+.success-box p {font-size:14px;color:var(--gray-600);line-height:1.6;font-weight:500}
+
+/* TOAST */
+.toast {position:fixed;bottom:24px;right:24px;background:var(--gray-900);color:#fff;padding:14px 22px;border-radius:var(--r);font-size:13.5px;font-weight:600;z-index:2000;transform:translateY(24px);opacity:0;transition:.3s;pointer-events:none;box-shadow:var(--shadow-lg)}
+.toast.show {transform:translateY(0);opacity:1}
+.toast.success {background:var(--green)}
+.toast.error {background:#c62828}
+
+/* FOOTER */
+.footer {background:var(--brand-gradient);color:rgba(255,255,255,.8);text-align:center;padding:24px;font-size:13px;margin-top:40px;box-shadow:0 -4px 16px rgba(0,0,0,.03)}
+.footer strong {color:#fff}
+
+/* BOTTOM NAV */
+.bottom-nav {display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid var(--gray-200);z-index:200;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.bn-tab {flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px 10px;border:none;background:transparent;color:var(--gray-500);cursor:pointer;transition:.15s;min-height:56px}
+.bn-tab.active {color:var(--orange)}
+.bn-tab.active .bn-icon {transform:scale(1.18)}
+.bn-icon {font-size:20px;line-height:1;transition:transform .15s}
+.bn-label {font-size:11px;font-weight:700;letter-spacing:.2px}
+
+/* RESPONSIVE */
+@media(max-width:480px){
+  .logo {display:none}
+  .nav-tabs {margin-left:0;width:100%;justify-content:stretch}
+  .nav-tab {flex:1;text-align:center;padding:6px 2px;font-size:12px}
+}
+@media(max-width:640px){
+  .header-inner {gap:8px;justify-content:center}
+  .nav-tab {padding:6px 12px;font-size:12px}
+  .form-row.cols-2, .form-row.cols-3, .form-row.cols-4 {grid-template-columns:1fr}
+  .dim-row {grid-template-columns:repeat(6,1fr)}
+  .dim-row .form-group:nth-child(1) {grid-column:1/4;grid-row:1}
+  .dim-row .form-group:nth-child(5) {grid-column:4/7;grid-row:1;border-right:none}
+  .dim-row .form-group:nth-child(2) {grid-column:1/3;grid-row:2;border-top:1.5px solid var(--gray-200)}
+  .dim-row .form-group:nth-child(3) {grid-column:3/5;grid-row:2;border-top:1.5px solid var(--gray-200)}
+  .dim-row .form-group:nth-child(4) {grid-column:5/7;grid-row:2;border-top:1.5px solid var(--gray-200);border-right:none}
+  .weight-summary {grid-template-columns:repeat(2,1fr)}
+  .service-grid {grid-template-columns:1fr}
+  .sc-footer {flex-direction:column}
+  .tracking-search {flex-direction:column;padding:10px}
+  .tracking-hero {padding:24px 16px}
+  .track-info-bar {grid-template-columns:1fr 1fr}
+  .main {padding:12px 10px}
+}
+
+/* Spinner */
+.spinner {display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin {to{transform:rotate(360deg)}}
+.loading {display:flex;align-items:center;justify-content:center;gap:10px;padding:32px;color:var(--gray-500);font-size:14px;font-weight:600}
+.loading-dot {display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--blue);animation:bounce 1.2s infinite ease-in-out}
+.loading-dot:nth-child(2) {animation-delay:.2s}
+.loading-dot:nth-child(3) {animation-delay:.4s}
+@keyframes bounce {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <img src="Logo VNGrow_Icon.png" alt="VNGROW" class="logo-img">
+      <div>
+        <div style="font-size:18px;font-weight:900;letter-spacing:.5px;line-height:1"><span style="color:var(--orange)">VN</span><span style="color:var(--blue)">GROW</span></div>
+        <div class="logo-tagline">EXPRESS FREIGHT</div>
+      </div>
+    </a>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('pricing')">💰 Tính Cước</button>
+      <button class="nav-tab" onclick="switchTab('tracking')">📦 Tracking</button>
+      <button class="nav-tab" onclick="switchTab('rfq')">📋 Báo Giá</button>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ======================== TAB: PRICING ======================== -->
+<div id="tab-pricing" class="tab-content active">
+
+  <!-- Input Card -->
+  <div class="card">
+    <div class="card-title"><span>🌍</span> THÔNG TIN LÔ HÀNG VẬN CHUYỂN</div>
+
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label class="form-label">Quốc gia đến <span class="req">*</span></label>
+        <div class="country-search-wrap">
+          <input type="text" id="countrySearch" class="form-control" placeholder="Tìm quốc gia... VD: Mỹ, Anh, Úc" autocomplete="off" oninput="filterCountries(this.value)" onfocus="openCountryDropdown()" onblur="setTimeout(closeCountryDropdown,300)">
+          <input type="hidden" id="selectedCountry">
+          <div class="country-dropdown" id="countryDropdown"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pieces -->
+    <div class="pieces-section-header">
+      <div class="pieces-section-label">📦 Danh sách chi tiết các kiện hàng</div>
+      <button class="btn-add-piece" onclick="addPiece()">＋ Thêm kiện</button>
+    </div>
+    <div id="pieces-container"></div>
+
+    <!-- Weight Summary -->
+    <div class="weight-summary">
+      <div class="ws-item">
+        <div class="ws-label">Tổng số kiện</div>
+        <div class="ws-value" id="ws-qty">0</div>
+        <div class="ws-unit">kiện</div>
+      </div>
+      <div class="ws-item">
+        <div class="ws-label">Trọng lượng (GW)</div>
+        <div class="ws-value" id="ws-gw">0</div>
+        <div class="ws-unit">kg</div>
+      </div>
+      <div class="ws-item">
+        <div class="ws-label">Thể tích quy đổi</div>
+        <div class="ws-value" id="ws-vw">0</div>
+        <div class="ws-unit">kg</div>
+      </div>
+      <div class="ws-item highlight">
+        <div class="ws-label">⚡ Trọng lượng tính phí</div>
+        <div class="ws-value" id="ws-cw">0</div>
+        <div class="ws-unit">kg</div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-ghost" onclick="resetPricing()">↺ Làm mới</button>
+      <span style="font-size:12.5px;color:var(--gray-500);font-weight:500">Cước phí sẽ tự động cập nhật khi bạn điền đủ thông tin</span>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-section">
+    <div class="results-header">
+      <div>
+        <div class="results-title">📊 KẾT QUẢ SO SÁNH CÁC HÃNG VẬN CHUYỂN</div>
+        <div class="results-sub" id="results-subtitle"></div>
+      </div>
+    </div>
+    <div id="results-placeholder" class="card" style="text-align:center;padding:40px 20px;color:var(--gray-400)">
+      <div style="font-size:44px;margin-bottom:12px">🌍</div>
+      <p style="font-size:14px;font-weight:500">Vui lòng nhập Quốc gia đến & chi tiết trọng lượng để xem cước phí tự động</p>
+    </div>
+    <div class="service-grid" id="service-cards"></div>
+  </div>
+
+</div>
+
+<!-- ======================== TAB: TRACKING ======================== -->
+<div id="tab-tracking" class="tab-content">
+
+  <div class="tracking-hero">
+    <h2>📦 TRA CỨU HÀNH TRÌNH VẬN ĐƠN QUỐC TẾ</h2>
+    <p>Nhập mã vận đơn (id_shipment hoặc booking_id) để theo dõi lộ trình thời gian thực từ Google Sheet.</p>
+    <div class="tracking-search">
+      <input type="text" id="trackingInput" placeholder="Nhập mã vận đơn (VD: S09-1783602974650, BK-1783601469672)" onkeydown="if(event.key==='Enter')doTracking()">
+      <button class="btn btn-orange" onclick="doTracking()">🔍 Tra cứu</button>
+    </div>
+  </div>
+
+  <div id="tracking-result"></div>
+  <div id="tracking-samples" class="card">
+    <div class="card-title"><span>📋</span> MÃ VẬN ĐƠN MẪU ĐỂ THỬ NGHIỆM</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="tracking-sample-btns"></div>
+  </div>
+
+</div>
+
+<!-- ======================== TAB: RFQ ======================== -->
+<div id="tab-rfq" class="tab-content">
+
+  <div class="rfq-header">
+    <div class="rfq-header-text">
+      <h2>📋 YÊU CẦU BÁO GIÁ ĐẶC BIỆT (RFQ)</h2>
+      <p>Dành cho hàng quá khổ, quá tải, hàng dễ hỏng, hóa chất, thú cưng hoặc chiều nhập khẩu về Việt Nam.</p>
+    </div>
+  </div>
+
+  <form id="rfq-form" onsubmit="submitRFQ(event)">
+
+    <!-- Section A -->
+    <div class="card">
+      <div class="section-title">👤 SECTION A: THÔNG TIN NGƯỜI LIÊN HỆ</div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Họ và tên <span class="req">*</span></label>
+          <input type="text" class="form-control" name="name" placeholder="VD: Nguyễn Văn A" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại <span class="req">*</span></label>
+          <input type="tel" class="form-control" name="phone" placeholder="VD: 0908123456" required>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Địa chỉ Email</label>
+          <input type="email" class="form-control" name="email" placeholder="VD: hotro@vngrow.vn">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tên công ty (nếu có)</label>
+          <input type="text" class="form-control" name="company" placeholder="VD: Công ty TNHH VNGROW">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section B -->
+    <div class="card">
+      <div class="section-title">📦 SECTION B: THÔNG TIN CHI TIẾT BƯU KIỆN</div>
+
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label">Hướng vận chuyển</label>
+        <div class="direction-toggle">
+          <div class="dir-btn active" onclick="setDir(this,'vn-out')">Việt Nam → Quốc tế</div>
+          <div class="dir-btn" onclick="setDir(this,'vn-in')">Quốc tế → Việt Nam</div>
+        </div>
+      </div>
+
+      <div class="form-row cols-2" style="margin-bottom:14px">
+        <div class="form-group">
+          <label class="form-label">Nước gửi / Nước đến <span class="req">*</span></label>
+          <input type="text" class="form-control" name="country" placeholder="VD: Mỹ (USA), Úc (Australia)..." required>
+        </div>
+      </div>
+
+      <div class="pieces-section-header" style="margin-bottom:10px">
+        <span class="pieces-section-label">📦 Kích thước & Trọng lượng chi tiết</span>
+        <button type="button" class="btn-add-piece" onclick="addRFQPiece()">＋ Thêm kiện</button>
+      </div>
+      <div id="rfq-pieces-container"></div>
+
+      <!-- RFQ Weight Summary -->
+      <div class="weight-summary" id="rfq-weight-summary" style="margin-top:14px">
+        <div class="ws-item"><div class="ws-label">Tổng số kiện</div><div class="ws-value" id="rfq-ws-qty">0</div><div class="ws-unit">kiện</div></div>
+        <div class="ws-item"><div class="ws-label">Tổng trọng lượng</div><div class="ws-value" id="rfq-ws-gw">0</div><div class="ws-unit">kg</div></div>
+        <div class="ws-item"><div class="ws-label">Trọng lượng quy đổi</div><div class="ws-value" id="rfq-ws-vw">0</div><div class="ws-unit">kg</div></div>
+        <div class="ws-item highlight"><div class="ws-label">⚡ Trọng lượng tính cước</div><div class="ws-value" id="rfq-ws-cw">0</div><div class="ws-unit">kg</div></div>
+      </div>
+
+    </div>
+
+    <!-- Section C -->
+    <div class="card">
+      <div class="section-title">📝 SECTION C: GHI CHÚ ĐẶC BIỆT</div>
+      <div class="form-group">
+        <label class="form-label">Các yêu cầu riêng biệt khác</label>
+        <textarea class="form-control" name="notes" placeholder="VD: Hàng cần đóng thùng gỗ, cọc trước chi phí, giao hẹn giờ..." style="min-height:100px"></textarea>
+      </div>
+    </div>
+
+    <!-- Section D -->
+    <div class="card">
+      <div class="section-title">📎 SECTION D: ĐÍNH KÈM CHỨNG TỪ / HÌNH ẢNH</div>
+      <div class="file-drop" onclick="document.getElementById('rfq-file-input').click()" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+        <div class="file-drop-icon">📁</div>
+        <p>Chọn tệp ảnh hoặc tài liệu PDF</p>
+        <small>Chấp nhận PDF, JPG, PNG. Tối đa 10MB/file. Sẽ tự động tải lên Google Drive của bạn.</small>
+      </div>
+      <input type="file" id="rfq-file-input" multiple accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(this)">
+      <div class="file-list" id="file-list"></div>
+      <p style="font-size:12px;color:var(--gray-500);margin-top:10px">* Lưu ý: Chứng từ sẽ giúp bộ phận kiểm hóa VNGROW thẩm định tính hợp pháp trước khi gửi.</p>
+    </div>
+
+    <button type="submit" class="btn btn-orange btn-lg btn-full" style="height:50px">📤 GỬI YÊU CẦU BÁO GIÁ</button>
+
+  </form>
+
+</div>
+</main>
+
+<!-- BOTTOM NAV (mobile/tablet only) -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bn-tab active" onclick="switchTab('pricing')" id="bn-pricing">
+    <span class="bn-icon">💰</span>
+    <span class="bn-label">Tính Cước</span>
+  </button>
+  <button class="bn-tab" onclick="switchTab('tracking')" id="bn-tracking">
+    <span class="bn-icon">📦</span>
+    <span class="bn-label">Tracking</span>
+  </button>
+  <button class="bn-tab" onclick="switchTab('rfq')" id="bn-rfq">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label">Báo Giá</span>
+  </button>
+</nav>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <strong>VNGROW CO., LTD</strong> · <strong>0901404020</strong> · <strong>contact@vngrow.com.vn</strong>
+</footer>
+
+<!-- MODAL: Confirm Rate -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📞 YÊU CẦU BÁO GIÁ CHI TIẾT</div>
+      <button class="modal-close" onclick="closeModal('modal-confirm')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="rate-summary" id="confirm-rate-summary"></div>
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="form-group">
+          <label class="form-label">Họ và tên quý khách <span class="req">*</span></label>
+          <input type="text" class="form-control" id="confirm-name" placeholder="e.g. Nguyễn Văn A">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="form-group">
+          <label class="form-label">Số điện thoại liên hệ <span class="req">*</span></label>
+          <input type="tel" class="form-control" id="confirm-phone" placeholder="e.g. 0908123456">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Thư điện tử (Email) – nếu có</label>
+        <input type="email" class="form-control" id="confirm-email" placeholder="email@example.com">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">Hủy bỏ</button>
+      <button class="btn btn-primary" onclick="submitConfirmRate()">✅ Xác nhận báo giá</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Booking -->
+<div class="modal-overlay" id="modal-booking">
+  <div class="modal" style="max-width:900px;width:100%">
+    <div class="modal-header">
+      <div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:2px;font-weight:600">← Quay lại trang so sánh cước</div>
+        <div class="modal-title">🚚 ĐẶT HÀNG VẬN CHUYỂN (BOOKING)</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-booking')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+
+      <!-- Rate banner -->
+      <div id="booking-summary" style="background:var(--blue-xl);padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;border-bottom:1px solid var(--gray-200)"></div>
+
+      <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px" class="bk-grid">
+
+        <!-- LEFT COL -->
+        <div>
+          <!-- Section A -->
+          <div style="border:1.5px solid var(--gray-200);border-radius:var(--r-lg);padding:16px;margin-bottom:16px;background:#FCFDFE">
+            <div class="section-title" style="margin-bottom:14px">👤 A. THÔNG TIN NGƯỜI TẠO BOOKING</div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label">Họ tên người tạo <span class="req">*</span></label>
+              <input class="form-control" id="bk-name" placeholder="Nguyễn Tiến Đạt" oninput="syncSenderIfChecked()">
+            </div>
+            <div class="form-row cols-2" style="margin-bottom:10px">
+              <div class="form-group">
+                <label class="form-label">Số điện thoại <span class="req">*</span></label>
+                <input class="form-control" id="bk-phone" placeholder="0908123456" oninput="syncSenderIfChecked()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email <span class="req">*</span></label>
+                <input class="form-control" id="bk-email" placeholder="email@example.com" oninput="syncSenderIfChecked()">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label">Công ty (nếu có)</label>
+              <input class="form-control" id="bk-company" placeholder="Công ty Tiến Đạt" oninput="syncSenderIfChecked()">
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">Địa chỉ người tạo <span class="req">*</span></label>
+              <textarea class="form-control" id="bk-address" placeholder="120 Trần Hưng Đạo, Quận 1, TP. Hồ Chí Minh" oninput="syncSenderIfChecked()" style="min-height:72px"></textarea>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-xl);padding:10px 12px;border-radius:var(--r);border:1.5px solid var(--blue);user-select:none">
+              <input type="checkbox" id="bk-same-sender" onchange="toggleSameAsSender(this)" style="width:16px;height:16px;accent-color:var(--blue)">
+              Người tạo booking đồng thời là người gửi hàng
+            </label>
+          </div>
+
+          <!-- Section B -->
+          <div style="border:1.5px solid var(--gray-200);border-radius:var(--r-lg);padding:16px">
+            <div class="section-title" style="margin-bottom:14px">🚚 B. THÔNG TIN NGƯỜI GỬI HÀNG (SENDER)</div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label">Họ tên người gửi <span class="req">*</span></label>
+              <input class="form-control" id="bk-sender-name" placeholder="Nguyễn Tiến Đạt">
+            </div>
+            <div class="form-row cols-2" style="margin-bottom:10px">
+              <div class="form-group">
+                <label class="form-label">Số điện thoại <span class="req">*</span></label>
+                <input class="form-control" id="bk-sender-phone" placeholder="0908123456">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email người gửi</label>
+                <input class="form-control" id="bk-sender-email" placeholder="email@example.com">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label">Công ty gửi hàng</label>
+              <input class="form-control" id="bk-sender-company" placeholder="Tên công ty gửi hàng">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Địa chỉ lấy hàng <span class="req">*</span></label>
+              <textarea class="form-control" id="bk-sender-address" placeholder="Địa chỉ lấy hàng tại Việt Nam" style="min-height:72px"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COL -->
+        <div>
+          <!-- Section C -->
+          <div style="border:1.5px solid var(--orange);border-radius:var(--r-lg);padding:16px;margin-bottom:16px;background:#FFFBF5">
+            <div class="section-title" style="margin-bottom:14px;color:var(--orange)">📍 C. THÔNG TIN NGƯỜI NHẬN HÀNG (CONSIGNEE)</div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label">Họ tên người nhận <span class="req">*</span></label>
+              <input class="form-control" id="bk-recv-name" placeholder="Michael Chang">
+            </div>
+            <div class="form-row cols-2" style="margin-bottom:10px">
+              <div class="form-group">
+                <label class="form-label">Số điện thoại <span class="req">*</span></label>
+                <input class="form-control" id="bk-recv-phone" placeholder="+1 (201) 555-8942">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email người nhận</label>
+                <input class="form-control" id="bk-recv-email" placeholder="receiver@example.com">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label">Công ty nhận hàng</label>
+              <input class="form-control" id="bk-recv-company" placeholder="Tên công ty nhận hàng">
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label">Nước đích (đã chọn)</label>
+              <input class="form-control" id="bk-recv-country" readonly style="background:var(--gray-100);color:var(--gray-600)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Địa chỉ chi tiết người nhận <span class="req">*</span></label>
+              <textarea class="form-control" id="bk-recv-address" placeholder="742 Evergreen Terrace, Springfield, OR, USA" style="min-height:72px"></textarea>
+            </div>
+          </div>
+
+          <!-- Section D: Package info -->
+          <div style="border:1.5px solid var(--orange-l);border-radius:var(--r-lg);padding:16px;background:#FFFBF5">
+            <div class="section-title" style="margin-bottom:12px;color:var(--orange-l)">Danh sách kiện hàng đặt gửi</div>
+            <div id="bk-pkg-list" style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--r);padding:12px;font-size:12.5px;font-family:monospace;line-height:1.8;min-height:60px;color:var(--gray-700)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-booking')">Hủy bỏ</button>
+      <button class="btn btn-primary btn-lg" onclick="submitBooking()">📦 Hoàn tất đặt hàng</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG — Đường dẫn URL Google Apps Script Web App của bạn
+// ============================================================
+const CONFIG = {
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwSkj17nJRUxGjJHdkkTMjCR8zrKbRAn-qYmUZ2dt34C1ek5kBHHHb1gBuIjSrgbPT1mg/exec',
+};
+
+// ============================================================
+// ENGLISH TO VIETNAMESE COUNTRY MAPPING (Để tìm bằng Tiếng Việt)
+// ============================================================
+const COUNTRY_MAP = {
+  'USA': 'Mỹ (USA)',
+  'Korea': 'Hàn Quốc (Korea)',
+  'Japan': 'Nhật Bản (Japan)',
+  'Germany': 'Đức (Germany)',
+  'Australia': 'Úc (Australia)',
+  'England': 'Anh (England)',
+  'Italy': 'Ý (Italy)',
+  'China-1': 'Trung Quốc - Vùng 1 (China)',
+  'China-2': 'Trung Quốc - Vùng 2 (China)',
+  'Taiwan': 'Đài Loan (Taiwan)',
+  'Hongkong': 'Hồng Kông (Hong Kong)',
+  'Singapore': 'Singapore',
+  'Thailand': 'Thái Lan (Thailand)',
+  'Cambodia': 'Campuchia (Cambodia)',
+  'Lao': 'Lào (Laos)',
+  'Russia': 'Nga (Russia)'
+};
+
+const SERVICE_INFO = {
+  'DHL':           {icon:'🟡', color:'orange'},
+  'FedEx IE':      {icon:'🟣', color:'blue'},
+  'FedEx IP':      {icon:'🟣', color:'blue'},
+  'UPS Saver':     {icon:'🟤', color:'green'},
+  'UPS Expedited': {icon:'🟤', color:'green'},
+  'EMS':           {icon:'🟢', color:'green'},
+  'Special Route': {icon:'✈️', color:'blue', featured:true},
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let COUNTRIES = [];
+let pieceCounter = 0;
+let rfqPieceCounter = 0;
+let selectedFiles = [];
+let currentQuote = null;
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.bn-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((el, i) => {
+    if (['pricing','tracking','rfq'][i] === tab) el.classList.add('active');
+  });
+  const bn = document.getElementById('bn-' + tab);
+  if (bn) bn.classList.add('active');
+}
+
+// ============================================================
+// COUNTRY DROPDOWN (Hỗ trợ song ngữ & Đọc chuẩn key)
+// ============================================================
+function renderCountryOptions(list) {
+  const dd = document.getElementById('countryDropdown');
+  if (!list.length) {
+    dd.innerHTML = '<div style="padding:12px 14px;color:var(--gray-500);font-size:13px">Không tìm thấy quốc gia</div>';
+    return;
+  }
+  dd.innerHTML = list.map(c => {
+    const name = c.country_name || c.country || '';
+    const displayName = COUNTRY_MAP[name] || name;
+    return `<div class="country-option" onmousedown="event.preventDefault();selectCountry('${name.replace(/'/g,"\\'")}', '${displayName.replace(/'/g,"\\'")}')">
+      ${displayName}
+    </div>`;
+  }).join('');
+}
+
+function selectCountry(name, displayName) {
+  document.getElementById('countrySearch').value = displayName;
+  document.getElementById('selectedCountry').value = name;
+  closeCountryDropdown();
+  autoCalculate();
+}
+
+function filterCountries(q) {
+  const filtered = q ? COUNTRIES.filter(c => {
+    const name = c.country_name || c.country || '';
+    const displayName = COUNTRY_MAP[name] || name;
+    return name.toLowerCase().includes(q.toLowerCase()) || displayName.toLowerCase().includes(q.toLowerCase());
+  }) : COUNTRIES;
+  renderCountryOptions(filtered);
+  document.getElementById('countryDropdown').classList.add('open');
+}
+
+function openCountryDropdown() {
+  renderCountryOptions(COUNTRIES);
+  document.getElementById('countryDropdown').classList.add('open');
+}
+
+function closeCountryDropdown() {
+  document.getElementById('countryDropdown').classList.remove('open');
+}
+
+// ============================================================
+// PIECES (PRICING)
+// ============================================================
+function addPiece() {
+  pieceCounter++;
+  const id = pieceCounter;
+  const div = document.createElement('div');
+  div.className = 'piece-card';
+  div.id = 'piece-' + id;
+  div.innerHTML = `
+    <div class="piece-header">
+      <span class="piece-num">Kiện #${id}</span>
+      <button type="button" class="btn-remove" onclick="removePiece(${id})">🗑 Xóa kiện</button>
+    </div>
+    <div class="piece-top-row" style="margin-bottom:12px">
+      <div class="form-group">
+        <label class="form-label">Tên hàng hóa</label>
+        <input type="text" class="form-control piece-name" placeholder="VD: Quần áo, đồ lưu niệm..." oninput="updateWeights()">
+      </div>
+      <div class="form-group" style="width:140px;flex-shrink:0">
+        <label class="form-label">HS Code (nếu có)</label>
+        <input type="text" class="form-control piece-hs" placeholder="VD: 610910" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" style="letter-spacing:.5px">
+      </div>
+      <div class="form-group" style="width:260px;flex-shrink:0">
+        <label class="form-label">Nhóm hàng hóa</label>
+        <select class="form-control select-sm piece-cargo-code" onchange="updateWeights()">
+          <option value="normal">Hàng thường (giày dép, quần áo, túi xách...)</option>
+          <option value="cosmetics">Mỹ phẩm (son, serum, dầu gội, kem...)</option>
+          <option value="food">Thực phẩm (bánh, kẹo, mắm, trà, cà phê...)</option>
+          <option value="electricity">Điện tử (điện thoại, laptop, phụ kiện...)</option>
+          <option value="document">Tài liệu (hợp đồng, hồ sơ, sách...)</option>
+          <option value="other">Khác</option>
+        </select>
+      </div>
+    </div>
+    <div class="dim-row">
+      <div class="form-group">
+        <label class="form-label">GW (KGS)</label>
+        <input type="number" class="form-control piece-gw" min="0" step="0.1" placeholder="0.0" oninput="updateWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DÀI (CM)</label>
+        <input type="number" class="form-control piece-l" min="0" placeholder="0" oninput="updateWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">RỘNG (CM)</label>
+        <input type="number" class="form-control piece-w" min="0" placeholder="0" oninput="updateWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CAO (CM)</label>
+        <input type="number" class="form-control piece-h" min="0" placeholder="0" oninput="updateWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">SỐ KIỆN</label>
+        <input type="number" class="form-control piece-qty" min="1" value="1" oninput="updateWeights()">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:10px">
+      <label class="form-label">Ghi chú chi tiết kiện hàng</label>
+      <textarea class="form-control piece-note" placeholder="Nhập ghi chú chi tiết: hàng dễ vỡ, yêu cầu xếp đứng..." style="min-height:50px"></textarea>
+    </div>`;
+  document.getElementById('pieces-container').appendChild(div);
+  updateWeights();
+}
+
+function removePiece(id) {
+  document.getElementById('piece-' + id).remove();
+  updateWeights();
+}
+
+function getPiecesData(containerSelector, gwClass, lClass, wClass, hClass, qtyClass) {
+  const cards = document.querySelectorAll(containerSelector + ' .piece-card');
+  let totalQty=0, totalGW=0, totalVW=0;
+  cards.forEach(card => {
+    const gw  = parseFloat(card.querySelector(gwClass)?.value) || 0;
+    const l   = parseFloat(card.querySelector(lClass)?.value) || 0;
+    const w   = parseFloat(card.querySelector(wClass)?.value) || 0;
+    const h   = parseFloat(card.querySelector(hClass)?.value) || 0;
+    const qty = parseInt(card.querySelector(qtyClass)?.value) || 1;
+    const vw  = (l * w * h) / 5000;
+    totalQty += qty;
+    totalGW  += gw * qty;
+    totalVW  += vw * qty;
+  });
+  const totalCW = Math.max(totalGW, totalVW);
+  return {totalQty, totalGW, totalVW, totalCW};
+}
+
+let autoCalcTimer = null;
+function updateWeights() {
+  const d = getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty');
+  document.getElementById('ws-qty').textContent = d.totalQty;
+  document.getElementById('ws-gw').textContent  = d.totalGW.toFixed(2);
+  document.getElementById('ws-vw').textContent  = d.totalVW.toFixed(2);
+  document.getElementById('ws-cw').textContent  = d.totalCW.toFixed(2);
+  clearTimeout(autoCalcTimer);
+  autoCalcTimer = setTimeout(autoCalculate, 400);
+}
+
+function autoCalculate() {
+  const countryCode = document.getElementById('selectedCountry').value;
+  if (!countryCode) return;
+  const d = getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty');
+  if (d.totalCW === 0 && d.totalGW === 0) return;
+  calculateRates(false);
+}
+
+// ============================================================
+// PIECES (RFQ)
+// ============================================================
+function addRFQPiece() {
+  rfqPieceCounter++;
+  const id = rfqPieceCounter;
+  const div = document.createElement('div');
+  div.className = 'piece-card';
+  div.id = 'rfq-piece-' + id;
+  div.innerHTML = `
+    <div class="piece-header">
+      <span class="piece-num">Kiện #${id}</span>
+      <button type="button" class="btn-remove" onclick="removeRFQPiece(${id})">🗑 Xóa kiện</button>
+    </div>
+    <div class="piece-top-row" style="margin-bottom:12px">
+      <div class="form-group">
+        <label class="form-label">Tên hàng hóa <span class="req">*</span></label>
+        <input type="text" class="form-control rfq-item-name" placeholder="VD: Trái cây sấy, tủ gỗ, máy hút bụi..." required oninput="updateRFQWeights()">
+      </div>
+      <div class="form-group" style="width:140px;flex-shrink:0">
+        <label class="form-label">HS Code (nếu có)</label>
+        <input type="text" class="form-control rfq-item-hs" placeholder="VD: 060290" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" style="letter-spacing:.5px">
+      </div>
+      <div class="form-group" style="width:160px;flex-shrink:0">
+        <label class="form-label">Nhóm hàng</label>
+        <select class="form-control select-sm rfq-cargo-code">
+          <option value="normal">Hàng thường</option>
+          <option value="cosmetics">Mỹ phẩm</option>
+          <option value="food">Thực phẩm</option>
+          <option value="electricity">Điện tử</option>
+          <option value="document">Tài liệu</option>
+          <option value="other">Khác</option>
+        </select>
+      </div>
+    </div>
+    <div class="dim-row">
+      <div class="form-group">
+        <label class="form-label">GW (KGS)</label>
+        <input type="number" class="form-control rfq-gw" min="0" step="0.1" placeholder="0.0" oninput="updateRFQWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DÀI (CM)</label>
+        <input type="number" class="form-control rfq-l" min="0" placeholder="0" oninput="updateRFQWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">RỘNG (CM)</label>
+        <input type="number" class="form-control rfq-w" min="0" placeholder="0" oninput="updateRFQWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CAO (CM)</label>
+        <input type="number" class="form-control rfq-h" min="0" placeholder="0" oninput="updateRFQWeights()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">SỐ KIỆN</label>
+        <input type="number" class="form-control rfq-qty" min="1" value="1" oninput="updateRFQWeights()">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:10px">
+      <label class="form-label">Ghi chú riêng cho kiện hàng</label>
+      <textarea class="form-control rfq-note" placeholder="VD: Hàng dễ hỏng, cần xếp lớp mỏng..." style="min-height:50px"></textarea>
+    </div>`;
+  document.getElementById('rfq-pieces-container').appendChild(div);
+  updateRFQWeights();
+}
+
+function removeRFQPiece(id) {
+  document.getElementById('rfq-piece-' + id).remove();
+  updateRFQWeights();
+}
+
+function updateRFQWeights() {
+  const d = getPiecesData('#rfq-pieces-container','.rfq-gw','.rfq-l','.rfq-w','.rfq-h','.rfq-qty');
+  document.getElementById('rfq-ws-qty').textContent = d.totalQty;
+  document.getElementById('rfq-ws-gw').textContent  = d.totalGW.toFixed(2);
+  document.getElementById('rfq-ws-vw').textContent  = d.totalVW.toFixed(2);
+  document.getElementById('rfq-ws-cw').textContent  = d.totalCW.toFixed(2);
+}
+
+// ============================================================
+// CALCULATE RATES (Hỗ trợ oversize checks đa kiện)
+// ============================================================
+function calculateRates(doScroll = true) {
+  const countryName = document.getElementById('selectedCountry').value;
+  if (!countryName) { showToast('Vui lòng chọn quốc gia đến', 'error'); return; }
+
+  const d = getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty');
+  if (d.totalCW === 0) { showToast('Vui lòng nhập trọng lượng hoặc kích thước hàng', 'error'); return; }
+
+  const chargeableKg = Math.max(d.totalCW, 0.5);
+  const cargoSelect = document.querySelector('#pieces-container .piece-card select.piece-cargo-code');
+  const cargoCode = cargoSelect ? cargoSelect.value : 'normal';
+
+  // Lấy dữ liệu kích thước từng kiện để kiểm tra quá khổ
+  const cards = document.querySelectorAll('#pieces-container .piece-card');
+  const piecesArray = Array.from(cards).map(card => {
+    const cargoSelect = card.querySelector('.piece-cargo-code');
+    return {
+      name: card.querySelector('.piece-name')?.value || '',
+      hs_code: card.querySelector('.piece-hs')?.value || '',
+      cargo_code: cargoSelect?.value || 'normal',
+      cargo_group: cargoSelect?.options[cargoSelect.selectedIndex]?.text || '',
+      l: parseFloat(card.querySelector('.piece-l')?.value) || 0,
+      w: parseFloat(card.querySelector('.piece-w')?.value) || 0,
+      h: parseFloat(card.querySelector('.piece-h')?.value) || 0,
+      gw: parseFloat(card.querySelector('.piece-gw')?.value) || 0,
+      qty: parseInt(card.querySelector('.piece-qty')?.value) || 1
+    };
+  });
+
+  const section   = document.getElementById('results-section');
+  const container = document.getElementById('service-cards');
+  section.style.display = 'block';
+  
+  const vnName = COUNTRY_MAP[countryName] || countryName;
+  document.getElementById('results-subtitle').textContent =
+    `Từ Việt Nam → ${vnName} · ${d.totalQty} kiện · Trọng lượng cước: ${chargeableKg.toFixed(2)} kg`;
+  document.getElementById('results-placeholder').style.display = 'none';
+
+  const savedY = window.scrollY;
+  container.innerHTML = '<div class="loading" style="grid-column:1/-1;padding:32px;justify-content:center"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+
+  if (doScroll) section.scrollIntoView({behavior:'smooth', block:'start'});
+  else requestAnimationFrame(() => window.scrollTo({top: savedY, behavior:'instant'}));
+
+  const url = `${CONFIG.APPS_SCRIPT_URL}?action=getRates&country=${encodeURIComponent(countryName)}&cargo_code=${cargoCode}&cw=${chargeableKg}&direction=export&pieces=${encodeURIComponent(JSON.stringify(piecesArray))}`;
+  
+  fetch(url)
+    .then(r => r.json())
+    .then(res => {
+      if (!res.success || !res.data?.rates?.length) {
+        container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Chưa có bảng giá cho quốc gia này. Vui lòng liên hệ nhân viên VNGROW.</div>';
+        return;
+      }
+      renderRateCards(container, res.data.rates, countryName, chargeableKg, savedY, doScroll, res.data.oversize_warnings || []);
+    })
+    .catch(() => {
+      container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Không thể tải bảng giá. Vui lòng thử lại.</div>';
+    });
+}
+
+function renderRateCards(container, rates, countryName, cw, savedY, doScroll, oversizeWarnings) {
+  const cards = rates.map((r, idx) => {
+    const info = SERVICE_INFO[r.service] || {icon:'📦', color:'blue', featured:false};
+    const isFeatured = info.featured || idx === 0;
+    const transitText = r.transit_min && r.transit_max
+      ? `${r.transit_min}–${r.transit_max} ngày làm việc`
+      : '';
+    const safeName = r.service.replace(/'/g, "\\'");
+    const safeCountry = countryName.replace(/'/g, "\\'");
+    
+    // Lọc cảnh báo quá khổ riêng cho hãng này
+    const svcWarnings = oversizeWarnings.filter(w => w.service === r.service);
+    const warningHtml = svcWarnings.length > 0
+      ? `<div style="background:#FFF5F5;border:1.5px solid #FFCDD2;color:#e53935;font-size:11px;font-weight:700;padding:6px 10px;border-radius:6px;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+           <span>⚠️</span> 
+           <span>Hàng quá khổ: ${svcWarnings.map(w => `${w.condition} > ${w.threshold} ${w.unit}`).join(', ')}</span>
+         </div>`
+      : '';
+
+    return `
+      <div class="service-card ${isFeatured?'featured':''}">
+        ${isFeatured ? '<div class="sc-badge">⭐ GIÁ TỐT NHẤT</div>' : ''}
+        <div class="sc-body">
+          <div class="sc-header">
+            <div class="sc-logo">${info.icon}</div>
+            <div>
+              <div class="sc-name">${r.service}</div>
+              ${transitText ? `<div class="sc-sub">🕐 ${transitText}</div>` : ''}
+            </div>
+          </div>
+          <div class="sc-price">${formatVND(r.total)}</div>
+          <div class="sc-price-note">
+            Cước gốc ${formatVND(r.freight)} + Xăng dầu ${r.fuel_pct}%
+            ${r.vat_pct > 0 ? ` + Thuế VAT ${r.vat_pct}%` : ' + Thuế VAT 0%'}
+            · CW ${cw.toFixed(2)} kg
+          </div>
+          ${warningHtml}
+          <div class="sc-footer">
+            <button class="btn btn-outline btn-sm"
+              onclick='openConfirmModal("${safeName}","${safeName}",${r.total},"${safeCountry}",${cw})'>
+              Xác nhận báo giá
+            </button>
+            <button class="btn btn-primary btn-sm"
+              onclick='openBookingModal("${safeName}","${safeName}",${r.total},"${safeCountry}",${cw})'>
+              📦 Booking
+            </button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = cards;
+  if (!doScroll) requestAnimationFrame(() => window.scrollTo({top: savedY, behavior:'instant'}));
+}
+
+function resetPricing() {
+  document.getElementById('countrySearch').value = '';
+  document.getElementById('selectedCountry').value = '';
+  document.getElementById('pieces-container').innerHTML = '';
+  pieceCounter = 0;
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('results-placeholder').style.display = 'block';
+  updateWeights();
+  addPiece();
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openConfirmModal(serviceKey, serviceName, price, country, cw) {
+  const vnCountry = COUNTRY_MAP[country] || country;
+  currentQuote = {serviceKey, serviceName, price, country, cw};
+  document.getElementById('confirm-rate-summary').innerHTML = `
+    <div class="rate-row"><span>Hãng vận chuyển:</span><strong>${serviceName}</strong></div>
+    <div class="rate-row"><span>Quốc gia đích:</span><strong>${vnCountry}</strong></div>
+    <div class="rate-row"><span>Trọng lượng tính phí:</span><strong>${cw.toFixed(2)} kg</strong></div>
+    <div class="rate-row"><span>Ước tính cước phí trọn gói:</span><strong>${formatVND(price)}</strong></div>`;
+  openModal('modal-confirm');
+}
+
+async function submitConfirmRate() {
+  const name = document.getElementById('confirm-name').value.trim();
+  const phone = document.getElementById('confirm-phone').value.trim();
+  if (!name || !phone) { showToast('Vui lòng điền đầy đủ tên và số điện thoại', 'error'); return; }
+
+  const submitBtn = document.querySelector('#modal-confirm .modal-footer .btn-primary');
+  const originalBtnText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span> Đang gửi...';
+
+  const cargoSelect = document.querySelector('#pieces-container .piece-card select.piece-cargo-code');
+  const cargoGroup = cargoSelect ? cargoSelect.options[cargoSelect.selectedIndex].text : 'Hàng thường';
+
+  try {
+    await apiPost({
+      action: 'submitRFQ',
+      contact_name: name,
+      contact_phone: phone,
+      contact_email: document.getElementById('confirm-email').value,
+      direction: 'export',
+      origin_country: 'Việt Nam',
+      destination_country: currentQuote?.country || '',
+      cargo_group: cargoSelect?.value || 'normal',
+      cargo_description: `Yêu cầu xác nhận báo giá: ${currentQuote?.serviceName || ''} - ${formatVND(currentQuote?.price || 0)} - CW ${Number(currentQuote?.cw || 0).toFixed(2)} kg`,
+      total_packages: document.getElementById('ws-qty')?.textContent || '1',
+      total_gw: document.getElementById('ws-gw')?.textContent || '0',
+      special_requirements: 'Xác nhận báo giá trực tuyến từ webapp',
+      price_quote: currentQuote?.price || ''
+    });
+
+    closeModal('modal-confirm');
+    showToast('✅ Xác nhận báo giá thành công! Nhân viên sẽ gọi lại sớm.', 'success');
+  } catch (err) {
+    showToast('Có lỗi xảy ra khi xác nhận báo giá.', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+}
+
+function getBookingPackageDetails() {
+  const cards = document.querySelectorAll('#pieces-container .piece-card');
+  return Array.from(cards).map((card, i) => {
+    const cargoSelect = card.querySelector('select.piece-cargo-code');
+    return {
+      index: i + 1,
+      name: card.querySelector('.piece-name')?.value || 'Kiện hàng hóa',
+      hs_code: card.querySelector('.piece-hs')?.value || '',
+      cargo_group: cargoSelect ? cargoSelect.options[cargoSelect.selectedIndex]?.text : 'Hàng thường',
+      cargo_code: cargoSelect ? cargoSelect.value : 'normal',
+      gw: parseFloat(card.querySelector('.piece-gw')?.value) || 0,
+      l: parseFloat(card.querySelector('.piece-l')?.value) || 0,
+      w: parseFloat(card.querySelector('.piece-w')?.value) || 0,
+      h: parseFloat(card.querySelector('.piece-h')?.value) || 0,
+      qty: parseInt(card.querySelector('.piece-qty')?.value) || 1,
+      note: card.querySelector('.piece-note')?.value || ''
+    };
+  });
+}
+
+function openBookingModal(serviceKey, serviceName, price, country, cw) {
+  const totals = getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty');
+  const bookingCw = Math.max(totals.totalCW, 0.5);
+  currentQuote = {serviceKey, serviceName, price, country, cw: bookingCw};
+
+  const vnCountry = COUNTRY_MAP[country] || country;
+
+  // Rate banner
+  document.getElementById('booking-summary').innerHTML = `
+    <div><div style="font-size:10px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.5px">Hãng vận chuyển</div><div style="font-size:14px;font-weight:700">${serviceName}</div></div>
+    <div><div style="font-size:10px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.5px">Quốc gia đích</div><div style="font-size:14px;font-weight:700">${vnCountry}</div></div>
+    <div><div style="font-size:10px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.5px">Tải trọng cước</div><div style="font-size:14px;font-weight:700">${bookingCw.toFixed(2)} kg</div></div>
+    <div><div style="font-size:10px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.5px">Cước phí ước tính</div><div style="font-size:18px;font-weight:900;color:var(--blue)">${formatVND(price)}</div></div>`;
+
+  // Pre-fill destination country
+  document.getElementById('bk-recv-country').value = vnCountry;
+
+  // Auto-extract package list from pieces
+  const packages = getBookingPackageDetails();
+  const pkgLines = packages.map(p => {
+    const hsText = p.hs_code ? ` · HS ${p.hs_code}` : '';
+    const noteText = p.note ? ` (Ghi chú: ${p.note})` : '';
+    return `#${p.index}: ${p.name}${hsText} [${p.cargo_group}]: GW ${p.gw}kg (${p.l}x${p.w}x${p.h}cm) x ${p.qty} kiện${noteText}`;
+  });
+  document.getElementById('bk-pkg-list').innerHTML = pkgLines.join('<br>') || '(Chưa có kiện hàng)';
+
+  openModal('modal-booking');
+}
+
+function toggleSameAsSender(cb) {
+  const fields = ['name','phone','email','company','address'];
+  const locked = cb.checked;
+  fields.forEach(f => {
+    const sender = document.getElementById('bk-sender-' + f);
+    if (!sender) return;
+    sender.readOnly = locked;
+    sender.style.background = locked ? 'var(--gray-100)' : '';
+    sender.style.color = locked ? 'var(--gray-600)' : '';
+    if (locked) sender.value = document.getElementById('bk-' + f)?.value || '';
+  });
+}
+
+function syncSenderIfChecked() {
+  if (!document.getElementById('bk-same-sender')?.checked) return;
+  toggleSameAsSender({checked: true});
+}
+
+async function submitBooking() {
+  const required = [
+    {id:'bk-name', label:'Họ tên người tạo'},
+    {id:'bk-phone', label:'Số điện thoại người tạo'},
+    {id:'bk-address', label:'Địa chỉ người tạo'},
+    {id:'bk-sender-name', label:'Họ tên người gửi'},
+    {id:'bk-sender-phone', label:'Số điện thoại người gửi'},
+    {id:'bk-sender-address', label:'Địa chỉ người gửi'},
+    {id:'bk-recv-name', label:'Họ tên người nhận'},
+    {id:'bk-recv-phone', label:'Số điện thoại người nhận'},
+    {id:'bk-recv-address', label:'Địa chỉ người nhận'},
+  ];
+  for (const {id, label} of required) {
+    const el = document.getElementById(id);
+    if (!el || !el.value.trim()) {
+      showToast(`Vui lòng điền: ${label}`, 'error'); return;
+    }
+  }
+
+  const submitBtn = document.querySelector('#modal-booking .modal-footer .btn-primary');
+  const originalBtnText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span> Đang tạo booking...';
+
+  const get = id => document.getElementById(id)?.value?.trim() || '';
+  const totals = getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty');
+
+  const data = {
+    action:              'submitBooking',
+    service:             currentQuote.serviceKey || currentQuote.serviceName || '',
+    direction:           'export',
+    origin_country:      'Việt Nam',
+    destination_country: currentQuote.country || '',
+    creator_name:        get('bk-name'),
+    creator_phone:       get('bk-phone'),
+    creator_email:       get('bk-email'),
+    creator_company:     get('bk-company'),
+    creator_address:     get('bk-address'),
+    sender_name:         get('bk-sender-name'),
+    sender_phone:        get('bk-sender-phone'),
+    sender_email:        get('bk-sender-email'),
+    sender_company:      get('bk-sender-company'),
+    sender_address:      get('bk-sender-address'),
+    receiver_name:       get('bk-recv-name'),
+    receiver_phone:      get('bk-recv-phone'),
+    receiver_email:      get('bk-recv-email'),
+    receiver_company:    get('bk-recv-company'),
+    receiver_address:    get('bk-recv-address'),
+    receiver_country:    currentQuote.country || '', // Sử dụng mã gốc (e.g. USA) để liên kết zone
+    total_packages:      totals.totalQty,
+    total_gw:            totals.totalGW,
+    total_cw:            totals.totalCW,
+    price_quote:         currentQuote.price || '',
+    hs_code:             getBookingPackageDetails().map(p => p.hs_code).filter(Boolean).join(', '),
+    package_details:     getBookingPackageDetails(),
+  };
+
+  try {
+    const res = await apiPost(data);
+    closeModal('modal-booking');
+    showToast(`🎉 Đặt hàng thành công! Mã đơn: ${res.data.id}. Nhân viên sẽ xác nhận trong 30 phút.`, 'success');
+    
+    // Tự động chuyển qua tab tracking và pre-fill mã booking để xem thử
+    setTimeout(() => {
+      switchTab('tracking');
+      document.getElementById('trackingInput').value = res.data.id;
+      doTracking();
+    }, 1500);
+    
+    resetPricing();
+  } catch (err) {
+    showToast('Lỗi gửi yêu cầu đặt hàng. Vui lòng thử lại.', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+}
+
+// ============================================================
+// TRACKING (Tích hợp tra cứu dữ liệu live thực tế)
+// ============================================================
+function doTracking() {
+  const code = document.getElementById('trackingInput').value.trim().toUpperCase();
+  if (!code) { showToast('Vui lòng nhập mã vận đơn', 'error'); return; }
+
+  const res = document.getElementById('tracking-result');
+  res.innerHTML = '<div class="loading"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+  document.getElementById('tracking-samples').style.display = 'none';
+
+  const url = `${CONFIG.APPS_SCRIPT_URL}?action=tracking&id=${encodeURIComponent(code)}`;
+  fetch(url)
+    .then(r => r.json())
+    .then(resData => {
+      // Vì API Apps Script của bạn trả về {success: true, data: { shipment, timeline }}
+      if (!resData.success || resData.data.error || !resData.data.shipment) {
+        showTrackingNotFound(code);
+        return;
+      }
+      
+      const s = resData.data.shipment;
+      const timelineData = resData.data.timeline || [];
+      
+      const tl = timelineData.map((t, i) => ({
+        done:   i < timelineData.length - 1,
+        active: i === timelineData.length - 1,
+        title:  t.status || 'Đang xử lý',
+        date:   t.timestamp ? new Date(t.timestamp).toLocaleString('vi-VN') : '',
+        loc:    t.location || 'Kho VNGROW',
+        desc:   t.description || ''
+      }));
+
+      // Map mã trạng thái sang màu hiển thị
+      let statusMap = 'in_transit';
+      let statusText = s.current_status || 'Chưa tiếp nhận';
+      if (statusText.includes('Đã giao') || statusText.includes('Thành công')) statusMap = 'delivered';
+      if (statusText.includes('hải quan') || statusText.includes('giữ')) statusMap = 'customs';
+
+      // Tính tổng số kiện & CW
+      const piecesText = `${s.total_pieces || 1} kiện · ${s.total_cw || s.total_chargeable_weight || 0} kg`;
+
+      renderTrackingResult({
+        trackingNo:  s.id_shipment || code,
+        service:     s.service && s.service !== 'Chưa tiếp nhận' ? s.service : 'Chuyên tuyến (Special Route)',
+        origin:      s.sender_country || 'Việt Nam',
+        dest:        s.receiver_name ? `${s.receiver_name} – ${s.receiver_country || ''}` : 'Quốc tế',
+        weight:      piecesText,
+        status:      statusMap,
+        statusText:  statusText,
+        pieces:      s.total_pieces || 1,
+        created:     s.created_date ? new Date(s.created_date).toLocaleDateString('vi-VN') : 'Đang xử lý',
+        eta:         s.eta_date ? new Date(s.eta_date).toLocaleDateString('vi-VN') : 'Đang cập nhật',
+        sender:      s.sender_name ? {name: s.sender_name, address: s.sender_address} : null,
+        receiver:    s.receiver_name ? {name: s.receiver_name, address: s.receiver_address} : null,
+        timeline:    tl,
+      });
+    })
+    .catch(() => showTrackingNotFound(code));
+}
+
+function demoTrack(code) {
+  document.getElementById('trackingInput').value = code;
+  doTracking();
+}
+
+function renderTrackingResult(data) {
+  const statusColors = {delivered:'green', in_transit:'blue', customs:'orange'};
+  const col = statusColors[data.status] || 'blue';
+  document.getElementById('tracking-result').innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:13px;color:var(--gray-500);font-weight:600">Mã vận đơn</div>
+          <div style="font-size:19px;font-weight:900;color:var(--gray-900)">${data.trackingNo}</div>
+        </div>
+        <span class="sc-tag ${col}" style="font-size:13.5px;padding:6px 14px;border-radius:20px;font-weight:700;display:inline-block">${data.statusText}</span>
+      </div>
+      <div class="track-info-bar">
+        <div class="tib-item"><label>Dịch vụ</label><p>${data.service}</p></div>
+        <div class="tib-item"><label>Nơi gửi</label><p>${data.origin}</p></div>
+        <div class="tib-item"><label>Tổng kiện hàng</label><p>${data.weight}</p></div>
+        <div class="tib-item"><label>Ngày giao dự kiến (ETA)</label><p>${data.eta}</p></div>
+      </div>
+    </div>
+    ${data.sender || data.receiver ? `
+    <div class="card">
+      <div class="card-title"><span>👥</span> THÔNG TIN LIÊN HỆ ĐƠN HÀNG</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="form-row">
+        ${data.sender ? `
+        <div style="background:var(--blue-xl);border-radius:var(--r);padding:14px">
+          <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📤 Người gửi (Sender)</div>
+          <div style="font-size:14px;font-weight:800;color:var(--gray-900);margin-bottom:4px">${data.sender.name}</div>
+          <div style="font-size:12.5px;color:var(--gray-600);line-height:1.5">📍 ${data.sender.address}</div>
+        </div>` : ''}
+        ${data.receiver ? `
+        <div style="background:var(--orange-xl);border-radius:var(--r);padding:14px">
+          <div style="font-size:11px;font-weight:800;color:var(--orange-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📥 Người nhận (Consignee)</div>
+          <div style="font-size:14px;font-weight:800;color:var(--gray-900);margin-bottom:4px">${data.receiver.name}</div>
+          <div style="font-size:12.5px;color:var(--gray-600);line-height:1.5">📍 ${data.receiver.address}</div>
+        </div>` : ''}
+      </div>
+    </div>` : ''}
+    <div class="card">
+      <div class="card-title"><span>🗺️</span> TIMELINE HÀNH TRÌNH ĐƠN HÀNG</div>
+      ${data.timeline.length > 0 ? `
+      <div class="timeline">
+        ${data.timeline.map(t => `
+          <div class="tl-item ${t.active?'active':t.done?'done':''}">
+            <div class="tl-dot"></div>
+            <div class="tl-title">${t.title}</div>
+            <div class="tl-meta">📅 ${t.date}</div>
+            <div class="tl-loc">📍 ${t.loc} ${t.desc ? `· <span style="font-weight:500;color:var(--gray-600)">${t.desc}</span>` : ''}</div>
+          </div>`).join('')}
+      </div>` : '<p style="text-align:center;padding:12px;color:var(--gray-500);font-weight:600">Đơn hàng mới được tiếp nhận, đang xử lý kiện hàng...</p>'}
+    </div>
+    <div style="text-align:center;margin-bottom:16px">
+      <button class="btn btn-ghost" onclick="resetTracking()">← Tra cứu mã khác</button>
+    </div>`;
+}
+
+function showTrackingNotFound(code) {
+  document.getElementById('tracking-result').innerHTML = `
+    <div class="card">
+      <div class="empty-state" style="text-align:center;padding:32px 20px;color:var(--gray-500)">
+        <div style="font-size:48px;margin-bottom:12px">🔍</div>
+        <p><strong>Không tìm thấy mã vận đơn: ${code}</strong></p>
+        <p style="margin-top:8px;font-size:13px">Hệ thống không tìm thấy mã vận đơn hoặc mã Booking tương ứng trong Google Sheet của bạn. Vui lòng xác thực lại mã.</p>
+        <button class="btn btn-outline" style="margin-top:16px" onclick="resetTracking()">← Thử lại</button>
+      </div>
+    </div>`;
+  document.getElementById('tracking-samples').style.display = 'block';
+}
+
+function resetTracking() {
+  document.getElementById('tracking-result').innerHTML = '';
+  document.getElementById('tracking-samples').style.display = 'block';
+  document.getElementById('trackingInput').value = '';
+}
+
+// ============================================================
+// RFQ (Tải ảnh/tài liệu Base64 đính kèm lên Drive)
+// ============================================================
+function setDir(el, dir) {
+  document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function handleFileSelect(input) {
+  Array.from(input.files).forEach(f => {
+    if (f.size > 10 * 1024 * 1024) { showToast(`Tệp tin ${f.name} vượt quá 10MB!`, 'error'); return; }
+    selectedFiles.push(f);
+  });
+  renderFileList();
+  input.value = '';
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  Array.from(e.dataTransfer.files).forEach(f => {
+    if (f.size > 10 * 1024 * 1024) { showToast(`Tệp tin ${f.name} vượt quá 10MB!`, 'error'); return; }
+    if (/\.(pdf|jpg|jpeg|png)$/i.test(f.name)) {
+      selectedFiles.push(f);
+    } else {
+      showToast('Định dạng tệp không được hỗ trợ (chỉ nhận PDF, JPG, PNG)', 'error');
+    }
+  });
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('file-list');
+  list.innerHTML = selectedFiles.map((f, i) => `
+    <div class="file-item">
+      <span>${f.name.toLowerCase().includes('.pdf')?'📄':'🖼️'} ${f.name}</span>
+      <small style="color:var(--gray-500);margin-right:6px;font-weight:600">${(f.size/1024).toFixed(0)} KB</small>
+      <button type="button" onclick="removeFile(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeFile(i) {
+  selectedFiles.splice(i, 1);
+  renderFileList();
+}
+
+async function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitRFQ(e) {
+  e.preventDefault();
+  
+  const submitBtn = document.querySelector('#rfq-form button[type=submit]');
+  const originalBtnText = submitBtn.innerHTML;
+  
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span> Đang gửi và tải file lên Drive...';
+
+  // 1. Chuyển đổi toàn bộ các file đính kèm thành chuỗi Base64
+  const filesData = [];
+  for (let i = 0; i < selectedFiles.length; i++) {
+    try {
+      const file = selectedFiles[i];
+      const base64 = await readFileAsBase64(file);
+      filesData.push({
+        name: file.name,
+        type: file.type,
+        base64: base64
+      });
+    } catch (err) {
+      console.warn("Lỗi đọc file:", err);
+    }
+  }
+
+  const form = document.getElementById('rfq-form');
+  const formData = Object.fromEntries(new FormData(form));
+  const d = getPiecesData('#rfq-pieces-container','.rfq-gw','.rfq-l','.rfq-w','.rfq-h','.rfq-qty');
+  
+  const items = [];
+  document.querySelectorAll('#rfq-pieces-container .piece-card').forEach((card, i) => {
+    items.push({
+      name: card.querySelector('.rfq-item-name')?.value,
+      gw: card.querySelector('.rfq-gw')?.value,
+      l: card.querySelector('.rfq-l')?.value,
+      w: card.querySelector('.rfq-w')?.value,
+      h: card.querySelector('.rfq-h')?.value,
+      qty: card.querySelector('.rfq-qty')?.value,
+    });
+  });
+
+  const dirText = document.querySelector('.direction-toggle .dir-btn.active')?.textContent || '';
+
+  const payload = {
+    action:              'submitRFQ',
+    contact_name:        formData.name    || '',
+    contact_phone:       formData.phone   || '',
+    contact_email:       formData.email   || '',
+    contact_company:     formData.company || '',
+    direction:           dirText.includes('Quốc tế →') ? 'import' : 'export',
+    origin_country:      'Việt Nam',
+    destination_country: formData.country || '',
+    cargo_group:         items[0]?.cargo_code || 'normal',
+    cargo_description:   items.map(i => `${i.name} (${i.gw}kg, ${i.l}x${i.w}x${i.h}cm x${i.qty} kiện)`).join('; '),
+    total_packages:      d.totalQty,
+    total_gw:            d.totalGW.toFixed(2),
+    special_requirements: formData.notes || '',
+    files:               filesData
+  };
+
+  try {
+    const res = await apiPost(payload);
+    form.innerHTML = `
+      <div class="card" style="border-top: 4px solid var(--green)">
+        <div class="success-box">
+          <div class="success-icon">🎉</div>
+          <h3>Gửi yêu cầu thành công!</h3>
+          <p>Yêu cầu báo giá đặc biệt mã số <strong>${res.data.id}</strong> đã được ghi nhận trực tuyến.<br>Nhân viên VNGROW sẽ liên hệ phản hồi bạn trong <strong>2 giờ làm việc</strong>.</p>
+          <br>
+          <button class="btn btn-primary" onclick="location.reload()">← Tạo yêu cầu mới</button>
+        </div>
+      </div>`;
+    showToast("Gửi yêu cầu báo giá RFQ thành công!", "success");
+  } catch (err) {
+    showToast("Lỗi gửi yêu cầu báo giá RFQ. Vui lòng thử lại.", "error");
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+}
+
+// ============================================================
+// API HELPERS
+// ============================================================
+async function apiPost(data) {
+  if (!CONFIG.APPS_SCRIPT_URL) {
+    showToast('Chưa cấu hình URL API Google Apps Script', 'error');
+    throw new Error('Missing URL');
+  }
+  const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  const res = await response.json();
+  if (!res.success) {
+    throw new Error(res.error || 'API Error');
+  }
+  return res;
+}
+
+async function loadCountries() {
+  try {
+    const r   = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getCountries`);
+    const res = await r.json();
+    if (res.success && res.data?.length) {
+      COUNTRIES = res.data;
+      renderCountryOptions(COUNTRIES);
+    }
+  } catch(err) { 
+    console.warn('Could not load countries:', err); 
+  }
+}
+
+// ============================================================
+// LOAD LIVE TRACKING SAMPLES IN TRACKING TAB
+// ============================================================
+async function loadTrackingSamples() {
+  try {
+    const r = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getCountries`); // just a ping to check connection
+    const sampleContainer = document.getElementById('tracking-sample-btns');
+    sampleContainer.innerHTML = `
+      <button class="btn btn-outline btn-sm" onclick="demoTrack('S09-1783602974650')">S09-1783602974650 (Dữ liệu live mẫu)</button>
+      <button class="btn btn-outline btn-sm" onclick="demoTrack('BK-1783601469672')">BK-1783601469672 (Dữ liệu Booking)</button>
+      <button class="btn btn-outline btn-sm" onclick="demoTrack('BK-1783602974650')">BK-1783602974650 (Booking đã có Shipment)</button>
+    `;
+  } catch (e) {
+    // fallback
+  }
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function formatVND(n) {
+  return Number(n).toLocaleString('vi-VN') + 'đ';
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Đóng modal khi click ra ngoài overlay
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ============================================================
+// INIT
+// ============================================================
+addPiece();
+addRFQPiece();
+loadCountries();
+loadTrackingSamples();
+</script>
+
+<!-- ============================================================ -->
+<!-- VNGROW AI Chatbot (widget) — gọi /api/chat (Claude)          -->
+<!-- ============================================================ -->
+<script>
+(function () {
+  var BRAND = "#1878C8", API = "/api/chat";
+  var sessionId = "web-" + Math.random().toString(36).slice(2);
+  var messages = [], open = false, loading = false;
+
+  var css = document.createElement("style");
+  css.textContent = ""
+    + "#vg-fab{position:fixed;right:20px;bottom:20px;width:60px;height:60px;border-radius:50%;background:" + BRAND + ";color:#fff;border:0;font-size:26px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.28);z-index:99999}"
+    + "#vg-panel{position:fixed;right:20px;bottom:20px;width:370px;max-width:92vw;height:540px;max-height:82vh;background:#fff;border-radius:16px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 12px 44px rgba(0,0,0,.3);z-index:99999;font-family:Inter,system-ui,sans-serif}"
+    + "#vg-panel.open{display:flex}"
+    + "#vg-head{background:" + BRAND + ";color:#fff;padding:13px 15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;font-size:15px}"
+    + "#vg-head span.x{cursor:pointer;font-size:18px;opacity:.9}"
+    + "#vg-log{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:9px;background:#f5f6f8}"
+    + ".vg-b{max-width:82%;padding:9px 12px;border-radius:14px;white-space:pre-wrap;line-height:1.45;font-size:14px}"
+    + ".vg-u{align-self:flex-end;background:" + BRAND + ";color:#fff;border-bottom-right-radius:4px}"
+    + ".vg-a{align-self:flex-start;background:#fff;color:#111;border:1px solid #e3e6ea;border-bottom-left-radius:4px}"
+    + "#vg-btns{display:flex;gap:6px;flex-wrap:wrap;padding:0 13px 6px}"
+    + "#vg-btns button{border:1px solid " + BRAND + ";color:" + BRAND + ";background:#fff;padding:7px 12px;border-radius:18px;font-size:13px;cursor:pointer}"
+    + "#vg-form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #eee}"
+    + "#vg-input{flex:1;padding:10px 12px;border:1px solid #ccc;border-radius:20px;font-size:14px;outline:none}"
+    + "#vg-send{background:" + BRAND + ";color:#fff;border:0;padding:0 16px;border-radius:20px;cursor:pointer;font-weight:600}";
+  document.head.appendChild(css);
+
+  var fab = document.createElement("button");
+  fab.id = "vg-fab"; fab.innerHTML = "💬"; fab.setAttribute("aria-label", "Chat báo giá");
+  document.body.appendChild(fab);
+
+  var panel = document.createElement("div");
+  panel.id = "vg-panel";
+  panel.innerHTML = ""
+    + '<div id="vg-head"><span>VNGROW · Báo giá gửi hàng</span><span class="x">&times;</span></div>'
+    + '<div id="vg-log"></div>'
+    + '<div id="vg-btns"></div>'
+    + '<form id="vg-form"><input id="vg-input" placeholder="Nhập tin nhắn..." autocomplete="off"/><button id="vg-send" type="submit">Gửi</button></form>';
+  document.body.appendChild(panel);
+
+  var log = panel.querySelector("#vg-log"),
+      btns = panel.querySelector("#vg-btns"),
+      input = panel.querySelector("#vg-input");
+
+  function add(role, text) {
+    var d = document.createElement("div");
+    d.className = "vg-b " + (role === "user" ? "vg-u" : "vg-a");
+    d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight;
+  }
+  function showButtons(list) {
+    btns.innerHTML = "";
+    (list || []).forEach(function (b) {
+      var el = document.createElement("button");
+      el.textContent = b.title; el.onclick = function () { send(b.title); };
+      btns.appendChild(el);
+    });
+  }
+  function send(text) {
+    if (!text || loading) return;
+    add("user", text); messages.push({ role: "user", content: text });
+    showButtons([]); input.value = ""; loading = true; add("assistant", "Đang soạn…");
+    var thinking = log.lastChild;
+    fetch(API, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: messages, sessionId: sessionId }) })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (thinking) thinking.remove();
+        var reply = data.reply || data.error || "(không có phản hồi)";
+        add("assistant", reply); messages.push({ role: "assistant", content: reply });
+        showButtons(data.buttons);
+      })
+      .catch(function (e) { if (thinking) thinking.remove(); add("assistant", "Lỗi kết nối: " + e); })
+      .then(function () { loading = false; });
+  }
+
+  fab.onclick = function () { open = true; panel.classList.add("open"); fab.style.display = "none";
+    if (!log.childNodes.length) add("assistant", "Dạ em chào anh/chị! Em là trợ lý VNGROW. Mình muốn gửi hàng đi nước nào, nặng khoảng bao nhiêu kg ạ?"); };
+  panel.querySelector(".x").onclick = function () { open = false; panel.classList.remove("open"); fab.style.display = "block"; };
+  panel.querySelector("#vg-form").addEventListener("submit", function (e) { e.preventDefault(); send(input.value.trim()); });
+})();
+</script>
+</body>
+</html>
