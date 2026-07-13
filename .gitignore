@@ -8,3 +8,8 @@ rfq.png
 tracking.png
 confirm_rate.png
 500x179.png
+
+node_modules
+.env
+.vercel
+_t.mjs
