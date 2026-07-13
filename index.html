@@ -88,12 +88,15 @@ textarea.form-control{resize:vertical;min-height:80px}
 .pieces-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .pieces-section-label{font-size:12px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
 .piece-top-row{display:flex;gap:10px;align-items:flex-start}
-.piece-top-row .form-group:first-child{flex:1;min-width:0}
+.piece-top-row .form-group:first-child{flex:1 1 240px;min-width:0}
+.piece-top-row .form-group:nth-child(3){min-width:240px}
 .select-sm{padding:8px 10px;font-size:12px}
 @media(max-width:640px){
   .piece-top-row{flex-wrap:wrap}
   .piece-top-row .form-group:first-child{width:100%;flex:unset}
-  .piece-top-row .form-group[style*="width:140px"],.piece-top-row .form-group[style*="width:150px"],.piece-top-row .form-group[style*="width:160px"]{width:calc(50% - 5px)!important;flex-shrink:0}
+  .piece-top-row .form-group:nth-child(2){width:38%!important;flex-shrink:0}
+  .piece-top-row .form-group:nth-child(3){width:calc(62% - 10px)!important;min-width:0;flex-shrink:0}
+  .piece-top-row .select-sm{font-size:13px;padding-left:10px;padding-right:28px}
 }
 
 /* WEIGHT SUMMARY */
@@ -603,7 +606,7 @@ textarea.form-control{resize:vertical;min-height:80px}
             </div>
             <div class="form-group" style="margin-bottom:12px">
               <label class="form-label">Địa chỉ <span class="req">*</span></label>
-              <input class="form-control" id="bk-address" placeholder="120 Trần Hưng Đạo, Quận 1, TP. Hồ Chí Minh" oninput="syncSenderIfChecked()">
+              <textarea class="form-control" id="bk-address" placeholder="120 Trần Hưng Đạo, Quận 1, TP. Hồ Chí Minh" oninput="syncSenderIfChecked()" style="min-height:72px"></textarea>
             </div>
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-700);background:var(--blue-xl);padding:10px 12px;border-radius:var(--r);border:1.5px solid var(--blue)">
               <input type="checkbox" id="bk-same-sender" onchange="toggleSameAsSender(this)" style="width:16px;height:16px;accent-color:var(--blue)">
@@ -634,7 +637,7 @@ textarea.form-control{resize:vertical;min-height:80px}
             </div>
             <div class="form-group">
               <label class="form-label">Địa chỉ <span class="req">*</span></label>
-              <input class="form-control" id="bk-sender-address" placeholder="Địa chỉ lấy hàng tại Việt Nam">
+              <textarea class="form-control" id="bk-sender-address" placeholder="Địa chỉ lấy hàng tại Việt Nam" style="min-height:72px"></textarea>
             </div>
           </div>
         </div>
@@ -794,9 +797,9 @@ function addPiece() {
       </div>
       <div class="form-group" style="width:140px;flex-shrink:0">
         <label class="form-label">HS Code (nếu có)</label>
-        <input type="text" class="form-control" placeholder="VD: 6109.10" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" style="letter-spacing:.5px">
+        <input type="text" class="form-control piece-hs" placeholder="VD: 6109.10" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" style="letter-spacing:.5px">
       </div>
-      <div class="form-group" style="width:160px;flex-shrink:0">
+      <div class="form-group" style="width:260px;flex-shrink:0">
         <label class="form-label">Nhóm hàng</label>
         <select class="form-control select-sm">
           <option value="normal">Hàng thường (giày dép, quần áo, túi xách...)</option>
@@ -1071,44 +1074,69 @@ function openConfirmModal(serviceKey, serviceName, price, country, cw) {
   openModal('modal-confirm');
 }
 
-function submitConfirmRate() {
+async function submitConfirmRate() {
   const name = document.getElementById('confirm-name').value.trim();
   const phone = document.getElementById('confirm-phone').value.trim();
   if (!name || !phone) { showToast('Vui lòng điền đầy đủ tên và số điện thoại', 'error'); return; }
-  sendToSheet('confirm_rate', {
-    ...currentQuote,
-    name, phone,
-    email: document.getElementById('confirm-email').value,
-    timestamp: new Date().toISOString()
+
+  await apiPost({
+    action: 'submitRFQ',
+    contact_name: name,
+    contact_phone: phone,
+    contact_email: document.getElementById('confirm-email').value,
+    direction: 'export',
+    origin_country: 'Việt Nam',
+    destination_country: currentQuote?.country || '',
+    cargo_group: document.querySelector('#pieces-container .piece-card select.form-control')?.value || 'normal',
+    cargo_description: `Yêu cầu xác nhận báo giá: ${currentQuote?.serviceName || ''} - ${formatVND(currentQuote?.price || 0)} - CW ${Number(currentQuote?.cw || 0).toFixed(2)} kg`,
+    total_packages: document.getElementById('ws-qty')?.textContent || '',
+    total_gw: document.getElementById('ws-gw')?.textContent || '',
+    special_requirements: 'Xác nhận báo giá từ webapp'
   });
+
   closeModal('modal-confirm');
   showToast('✅ Đã ghi nhận! Nhân viên sẽ liên hệ bạn sớm.', 'success');
 }
 
+function getBookingPackageDetails() {
+  const cards = document.querySelectorAll('#pieces-container .piece-card');
+  return Array.from(cards).map((card, i) => {
+    const cargoSelect = card.querySelector('select.form-control');
+    return {
+      index: i + 1,
+      name: card.querySelector('input[type=text]')?.value || 'Hàng hóa',
+      hs_code: card.querySelector('.piece-hs')?.value || '',
+      cargo_group: cargoSelect?.options[cargoSelect.selectedIndex]?.text || 'Hàng thường',
+      cargo_code: cargoSelect?.value || 'normal',
+      gw: parseFloat(card.querySelector('.piece-gw')?.value) || 0,
+      l: parseFloat(card.querySelector('.piece-l')?.value) || 0,
+      w: parseFloat(card.querySelector('.piece-w')?.value) || 0,
+      h: parseFloat(card.querySelector('.piece-h')?.value) || 0,
+      qty: parseInt(card.querySelector('.piece-qty')?.value) || 1,
+    };
+  });
+}
+
 function openBookingModal(serviceKey, serviceName, price, country, flag, cw) {
-  currentQuote = {serviceKey, serviceName, price, country, flag, cw};
+  const totals = getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty');
+  const bookingCw = Math.max(totals.totalCW, 0.5);
+  currentQuote = {serviceKey, serviceName, price, country, flag, cw: bookingCw};
 
   // Rate banner
   document.getElementById('booking-summary').innerHTML = `
     <div><div style="font-size:10px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Công vận chuyển</div><div style="font-size:14px;font-weight:700">${serviceName}</div></div>
     <div><div style="font-size:10px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Quốc gia đích</div><div style="font-size:14px;font-weight:700">${country}</div></div>
-    <div><div style="font-size:10px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Tải trọng cước</div><div style="font-size:14px;font-weight:700">${cw.toFixed(2)} kg <span style="font-size:11px;color:var(--blue)">Trọng lượng tính phí</span></div></div>
+    <div><div style="font-size:10px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Tải trọng cước</div><div style="font-size:14px;font-weight:700">${bookingCw.toFixed(2)} kg <span style="font-size:11px;color:var(--blue)">Trọng lượng tính phí</span></div></div>
     <div><div style="font-size:10px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Cước phí trọn gói</div><div style="font-size:18px;font-weight:800;color:var(--blue)">${formatVND(price)}</div><div style="font-size:10px;color:var(--gray-500)">Nền cước + Xăng dầu + Thuế VAT</div></div>`;
 
   // Pre-fill destination country
   document.getElementById('bk-recv-country').value = country;
 
   // Auto-extract package list from pieces
-  const cards = document.querySelectorAll('#pieces-container .piece-card');
-  let pkgLines = [];
-  cards.forEach((card, i) => {
-    const name = card.querySelector('input[type=text]')?.value || 'Hàng hóa';
-    const gw   = card.querySelector('.piece-gw')?.value || '0';
-    const l    = card.querySelector('.piece-l')?.value || '0';
-    const w    = card.querySelector('.piece-w')?.value || '0';
-    const h    = card.querySelector('.piece-h')?.value || '0';
-    const qty  = card.querySelector('.piece-qty')?.value || '1';
-    pkgLines.push(`#${i+1}: ${name} [Hàng thường]: GW ${gw}kg (${l}x${w}x${h}cm) x ${qty} kiện`);
+  const packages = getBookingPackageDetails();
+  const pkgLines = packages.map(p => {
+    const hsText = p.hs_code ? ` · HS ${p.hs_code}` : '';
+    return `#${p.index}: ${p.name}${hsText} [${p.cargo_group}]: GW ${p.gw}kg (${p.l}x${p.w}x${p.h}cm) x ${p.qty} kiện`;
   });
   document.getElementById('bk-pkg-list').innerHTML = pkgLines.join('<br>') || '(Chưa có kiện hàng)';
 
@@ -1170,17 +1198,23 @@ function submitBooking() {
     creator_phone:       get('bk-phone'),
     creator_email:       get('bk-email'),
     creator_company:     get('bk-company'),
+    creator_address:     get('bk-address'),
     sender_name:         get('bk-sender-name'),
     sender_phone:        get('bk-sender-phone'),
+    sender_email:        get('bk-sender-email'),
+    sender_company:      get('bk-sender-company'),
     sender_address:      get('bk-sender-address'),
     receiver_name:       get('bk-recv-name'),
     receiver_phone:      get('bk-recv-phone'),
+    receiver_email:      get('bk-recv-email'),
+    receiver_company:    get('bk-recv-company'),
     receiver_address:    get('bk-recv-address'),
     receiver_country:    get('bk-recv-country'),
-    total_packages:      document.querySelectorAll('#pieces-container .piece-card').length,
-    total_gw:            parseFloat(document.getElementById('ws-gw')?.textContent) || 0,
-    total_cw:            currentQuote.cw || 0,
-    package_details:     document.getElementById('bk-pkg-list')?.innerText || '',
+    total_packages:      getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty').totalQty,
+    total_gw:            getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty').totalGW,
+    total_cw:            getPiecesData('#pieces-container','.piece-gw','.piece-l','.piece-w','.piece-h','.piece-qty').totalCW,
+    hs_code:             getBookingPackageDetails().map(p => p.hs_code).filter(Boolean).join(', '),
+    package_details:     getBookingPackageDetails(),
   });
   closeModal('modal-booking');
   showToast('🎉 Đặt hàng thành công! Nhân viên sẽ xác nhận trong 30 phút.', 'success');
