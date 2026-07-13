@@ -1568,6 +1568,7 @@ loadCountries();
 <script>
 (function () {
   var BRAND = "#1878C8", API = "/api/chat";
+  var ZALO_LINK = "https://zalo.me/0901404020", STAFF_PHONE = "0901404020";
   var sessionId = "web-" + Math.random().toString(36).slice(2);
   var messages = [], loading = false;
 
@@ -1606,16 +1607,42 @@ loadCountries();
       btns = panel.querySelector("#vg-btns"),
       input = panel.querySelector("#vg-input");
 
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+  function mdToHtml(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>"); }
   function add(role, text) {
     var d = document.createElement("div");
     d.className = "vg-b " + (role === "user" ? "vg-u" : "vg-a");
-    d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight;
+    if (role === "user") { d.textContent = text; } else { d.innerHTML = mdToHtml(text); }
+    log.appendChild(d); log.scrollTop = log.scrollHeight;
+    return d;
+  }
+  function addTable(t) {
+    var wrap = document.createElement("div");
+    wrap.className = "vg-b vg-a"; wrap.style.maxWidth = "97%"; wrap.style.padding = "10px";
+    var html = "";
+    if (t.title) html += '<div style="font-weight:700;margin-bottom:6px">' + esc(t.title) + "</div>";
+    html += '<table style="border-collapse:collapse;width:100%;font-size:12.5px">';
+    html += "<tr>" + t.headers.map(function (h) { return '<th style="text-align:left;padding:5px 6px;border-bottom:2px solid ' + BRAND + '">' + esc(h) + "</th>"; }).join("") + "</tr>";
+    t.rows.forEach(function (r, i) {
+      html += '<tr style="background:' + (i % 2 ? "#f5f7fa" : "#fff") + '">' + r.map(function (c, ci) {
+        return '<td style="padding:5px 6px;border-bottom:1px solid #eee;' + (ci === r.length - 1 ? "font-weight:700;color:" + BRAND : "") + '">' + esc(c) + "</td>";
+      }).join("") + "</tr>";
+    });
+    html += "</table>";
+    if (t.note) html += '<div style="margin-top:6px;font-size:12px;color:#888">' + esc(t.note) + "</div>";
+    wrap.innerHTML = html;
+    log.appendChild(wrap); log.scrollTop = log.scrollHeight;
+  }
+  function openContact() {
+    try { window.open(ZALO_LINK, "_blank"); } catch (e) {}
+    add("assistant", "Dạ anh/chị bấm vào cửa sổ Zalo em vừa mở để chat trực tiếp với nhân viên nhé. Nếu mình không dùng Zalo, gọi giúp em số **" + STAFF_PHONE + "** ạ.");
   }
   function showButtons(list) {
     btns.innerHTML = "";
     (list || []).forEach(function (b) {
       var el = document.createElement("button");
-      el.textContent = b.title; el.onclick = function () { send(b.title); };
+      el.textContent = b.title;
+      el.onclick = function () { if (b.payload === "CONTACT") { openContact(); } else { send(b.title); } };
       btns.appendChild(el);
     });
   }
@@ -1631,6 +1658,7 @@ loadCountries();
         if (thinking) thinking.remove();
         var reply = data.reply || data.error || "(không có phản hồi)";
         add("assistant", reply); messages.push({ role: "assistant", content: reply });
+        if (data.table) addTable(data.table);
         showButtons(data.buttons);
       })
       .catch(function (e) { if (thinking) thinking.remove(); add("assistant", "Lỗi kết nối: " + e); })

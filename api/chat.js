@@ -1,37 +1,40 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { computeQuote } from "../lib/pricing.js";
+import { computeQuote, computeAllQuotes, fmtVND } from "../lib/pricing.js";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY_EXPRESS_BUSINESS,
 });
 const MODEL = process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
 
-const SYSTEM = `Bạn là trợ lý báo giá của VNGROW - chuyển phát nhanh quốc tế từ Việt Nam đi nước ngoài. Xưng "em", gọi khách "anh/chị", trả lời NGẮN GỌN, thân thiện, tiếng Việt.
+const SYSTEM = `Bạn là trợ lý báo giá của VNGROW - chuyển phát nhanh quốc tế từ Việt Nam đi nước ngoài. Xưng "em", gọi khách "anh/chị", lịch sự, chuyên nghiệp, NGẮN GỌN. Không đùa cợt quá đà.
 
 NHIỆM VỤ: thu thập thông tin rồi báo giá.
-Cần để báo giá: nước đến + cân nặng. Xin thêm kích thước (nếu hàng cồng kềnh), loại hàng, tên + SĐT để lưu hồ sơ và nhân viên hỗ trợ. Thiếu gì hỏi nấy, mỗi lượt tối đa 2 ý.
+Cần để báo giá: nước đến + cân nặng. Nên xin thêm KÍCH THƯỚC KIỆN và kho gửi để tính chính xác. Xin tên + SĐT để lưu hồ sơ, nhân viên hỗ trợ. Thiếu gì hỏi nấy, mỗi lượt tối đa 2 ý.
 
-TÍNH GIÁ: LUÔN gọi tool get_quote để lấy số (đừng tự tính). Mặc định service_code="DHL" nếu khách không nêu hãng. cargo_group suy từ mô tả hàng: quần áo/giày/túi=normal, mỹ phẩm=cosmetics, thực phẩm=food, điện tử=electricity, tài liệu=document, thực vật=plan.
-- Nếu get_quote trả ok=false (need_human hoặc chưa phục vụ): xin lỗi nhẹ nhàng, đề nghị để nhân viên báo giá riêng, KHÔNG bịa số.
-- Nếu ok=true: trình bày base + từng phụ phí (addons) + VAT + TỔNG. Nếu có optional thì nói "có thể phát sinh tuỳ mặt hàng: ...". Ghi rõ "giá tạm tính".
+CÁCH HỎI KÍCH THƯỚC (quan trọng): hỏi để tính đúng, KHÔNG hỏi kiểu "có cồng kềnh không". Diễn đạt: "Anh/chị cho em xin kích thước kiện (dài × rộng × cao, cm) để em tính cước chính xác, tránh phát sinh do trọng lượng quy đổi nhé." Nếu khách không có/không rõ, cứ tính theo cân thực và nói rõ giá có thể đổi nhẹ nếu kiện to.
 
-LƯU HỒ SƠ: khi đã có tên+SĐT hoặc vừa báo giá xong, gọi tool save_lead để ghi vào CRM (kể cả khách chưa chốt).
+TÍNH GIÁ: LUÔN gọi tool compare_carriers để lấy bảng so sánh các hãng (đừng tự tính). Mặc định origin HCM nếu khách chưa nói. cargo_group suy từ mô tả: quần áo/giày/túi = normal, mỹ phẩm = cosmetics, thực phẩm = food, điện tử = electricity, tài liệu = document, thực vật = plan.
+- Sau khi gọi compare_carriers, hệ thống tự hiển thị BẢNG giá cho khách. Bạn chỉ cần viết 1-2 câu dẫn ngắn gọn (vd "Dạ đây là báo giá tạm tính các hãng cho lô 5kg đi Mỹ ạ:") — KHÔNG liệt kê lại số trong bảng.
+- Ghi rõ đây là "giá tạm tính".
 
-Sau khi báo giá xong, kết thúc bằng câu mời khách chọn "Liên hệ nhân viên" hoặc "Booking".`;
+PHỤ PHÍ: chỉ nhắc phụ phí khi THỰC SỰ liên quan mặt hàng khách nói. Hàng thường (quần áo, giày, túi...) thì KHÔNG nhắc gì về gỗ, hun trùng, FDA. Đừng tự bịa tình huống phát sinh không liên quan.
+
+LƯU HỒ SƠ: khi có tên + SĐT hoặc vừa báo giá, gọi tool save_lead (kể cả khách chưa chốt).
+
+KẾT THÚC lịch sự, không đùa: mời khách theo hướng "Anh/chị muốn liên hệ nhân viên để hỏi thêm không ạ? Hoặc anh/chị để lại số điện thoại, em nhờ nhân viên gọi lại tư vấn kỹ hơn." Rồi để 2 nút bên dưới.`;
 
 const tools = [
   {
-    name: "get_quote",
-    description: "Tính cước VNGROW theo bảng giá. Trả về base, addons (phụ phí), vat, total. Luôn dùng tool này để lấy con số, không tự tính.",
+    name: "compare_carriers",
+    description: "Tính và so sánh cước tất cả hãng (DHL, FedEx IP/IE, EMS, Chuyên tuyến) cho 1 lô hàng. Trả về bảng giá. Luôn dùng để báo giá.",
     input_schema: {
       type: "object",
       properties: {
-        destination_country: { type: "string", description: "Tên nước đến, vd USA, JAPAN, AUSTRALIA" },
-        service_code: { type: "string", enum: ["DHL", "FEDEX_IP", "FEDEX_IE", "EMS"], description: "Mặc định DHL" },
+        destination_country: { type: "string", description: "Tên nước đến, vd USA, JAPAN" },
         cargo_group: { type: "string", enum: ["normal", "cosmetics", "food", "electricity", "document", "plan", "other"] },
         origin_city: { type: "string", enum: ["HCM", "HN"] },
         direction: { type: "string", enum: ["export", "import"] },
-        invoice_vat: { type: "boolean", description: "true nếu khách lấy hoá đơn VAT" },
+        invoice_vat: { type: "boolean" },
         packages: {
           type: "array",
           items: {
@@ -69,23 +72,30 @@ const tools = [
 
 async function saveLead(input) {
   const url = process.env.LEAD_WEBHOOK_URL;
-  if (!url) return { ok: true, note: "LEAD_WEBHOOK_URL chưa cấu hình - bỏ qua ghi CRM" };
+  if (!url) return { ok: true, note: "chưa cấu hình CRM webhook - bỏ qua" };
   try {
     const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...input, rfq_date: new Date().toISOString().slice(0, 10) }),
     });
     return { ok: r.ok };
-  } catch (e) {
-    return { ok: false, error: String(e) };
-  }
+  } catch (e) { return { ok: false, error: String(e) }; }
 }
 
-async function runTool(name, input) {
-  if (name === "get_quote") return computeQuote(input);
-  if (name === "save_lead") return saveLead(input);
-  return { ok: false, error: "unknown tool" };
+function buildTable(rows, dest) {
+  const served = rows.filter((r) => r.ok);
+  const notServed = rows.filter((r) => !r.ok).map((r) => r.service_name);
+  return {
+    title: "Báo giá tạm tính đi " + dest,
+    headers: ["Hãng", "Cước", "Phụ phí", "VAT", "Tổng"],
+    rows: served.map((r) => [
+      r.service_name, fmtVND(r.base),
+      r.surcharge ? fmtVND(r.surcharge) : "—",
+      r.vat ? fmtVND(r.vat) : "—",
+      fmtVND(r.total),
+    ]),
+    note: notServed.length ? ("Cần nhân viên báo giá riêng: " + notServed.join(", ")) : "",
+  };
 }
 
 export default async function handler(req, res) {
@@ -98,7 +108,7 @@ export default async function handler(req, res) {
   try {
     const { messages = [], sessionId = "" } = req.body || {};
     const convo = messages.map((m) => ({ role: m.role, content: m.content }));
-    let quoted = false;
+    let quoted = false, table = null;
 
     for (let i = 0; i < 6; i++) {
       const resp = await client.messages.create({
@@ -110,9 +120,15 @@ export default async function handler(req, res) {
         const results = [];
         for (const c of resp.content) {
           if (c.type !== "tool_use") continue;
-          const input = c.name === "save_lead" ? { chat_id: sessionId, ...c.input } : c.input;
-          const out = await runTool(c.name, input);
-          if (c.name === "get_quote" && out.ok) quoted = true;
+          let out;
+          if (c.name === "compare_carriers") {
+            const rows = computeAllQuotes(c.input);
+            table = buildTable(rows, c.input.destination_country);
+            if (rows.some((r) => r.ok)) quoted = true;
+            out = { rows };
+          } else if (c.name === "save_lead") {
+            out = await saveLead({ chat_id: sessionId, ...c.input });
+          } else { out = { ok: false, error: "unknown tool" }; }
           results.push({ type: "tool_result", tool_use_id: c.id, content: JSON.stringify(out) });
         }
         convo.push({ role: "user", content: results });
@@ -123,11 +139,11 @@ export default async function handler(req, res) {
       const buttons = quoted
         ? [{ title: "Liên hệ nhân viên", payload: "CONTACT" }, { title: "Booking", payload: "BOOKING" }]
         : [];
-      return res.status(200).json({ reply: text, buttons });
+      return res.status(200).json({ reply: text, buttons, table });
     }
     return res.status(200).json({
       reply: "Dạ để chắc chắn, em nhờ nhân viên hỗ trợ mình nhé!",
-      buttons: [{ title: "Liên hệ nhân viên", payload: "CONTACT" }],
+      buttons: [{ title: "Liên hệ nhân viên", payload: "CONTACT" }], table: null,
     });
   } catch (e) {
     return res.status(500).json({ error: String(e?.message || e) });
