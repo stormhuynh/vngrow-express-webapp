@@ -1,7 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { computeQuote } from "../lib/pricing.js";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY_EXPRESS_BUSINESS,
+});
 const MODEL = process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
 
 const SYSTEM = `Bạn là trợ lý báo giá của VNGROW - chuyển phát nhanh quốc tế từ Việt Nam đi nước ngoài. Xưng "em", gọi khách "anh/chị", trả lời NGẮN GỌN, thân thiện, tiếng Việt.
