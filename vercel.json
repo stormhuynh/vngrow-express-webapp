@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/chat", "destination": "/chat.html" },
+    { "source": "/((?!api/|chat).*)", "destination": "/index.html" }
   ],
   "functions": { "api/chat.js": { "maxDuration": 30 } }
 }

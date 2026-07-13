@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>VNGROW · Chat báo giá gửi hàng quốc tế</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --brand:#1878C8; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family:Inter,system-ui,sans-serif; background:#eef2f6; }
+  #app { max-width:520px; margin:0 auto; height:100dvh; display:flex; flex-direction:column; background:#fff; }
+  header { background:var(--brand); color:#fff; padding:14px 16px; font-weight:700; font-size:16px; display:flex; align-items:center; gap:10px; }
+  header img { height:26px; }
+  #log { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:9px; background:#f5f6f8; }
+  .b { max-width:84%; padding:10px 12px; border-radius:14px; white-space:pre-wrap; line-height:1.45; font-size:14px; }
+  .u { align-self:flex-end; background:var(--brand); color:#fff; border-bottom-right-radius:4px; }
+  .a { align-self:flex-start; background:#fff; color:#111; border:1px solid #e3e6ea; border-bottom-left-radius:4px; }
+  #btns { display:flex; gap:8px; flex-wrap:wrap; padding:0 14px 6px; }
+  #btns button { border:1px solid var(--brand); color:var(--brand); background:#fff; padding:8px 13px; border-radius:20px; font-size:13px; cursor:pointer; }
+  form { display:flex; gap:8px; padding:10px 12px; border-top:1px solid #eee; padding-bottom:calc(10px + env(safe-area-inset-bottom)); }
+  input { flex:1; padding:11px 13px; border:1px solid #ccc; border-radius:22px; font-size:15px; outline:none; }
+  form button { background:var(--brand); color:#fff; border:0; padding:0 18px; border-radius:22px; cursor:pointer; font-weight:600; }
+  table { border-collapse:collapse; width:100%; min-width:320px; font-size:12.5px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>🚚 VNGROW · Báo giá gửi hàng quốc tế</header>
+  <div id="log"></div>
+  <div id="btns"></div>
+  <form id="f"><input id="t" placeholder="Nhập tin nhắn..." autocomplete="off" /><button type="submit">Gửi</button></form>
+</div>
+<script>
+(function () {
+  var API = "/api/chat", BRAND = "#1878C8";
+  var ZALO_LINK = "https://zalo.me/0901404020", STAFF_PHONE = "0901404020";
+  var sessionId = "page-" + Math.random().toString(36).slice(2);
+  var messages = [], loading = false;
+  var log = document.getElementById("log"), btns = document.getElementById("btns"), input = document.getElementById("t");
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+  function md(s){ return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>"); }
+  function add(role,text){ var d=document.createElement("div"); d.className="b "+(role==="user"?"u":"a"); if(role==="user")d.textContent=text; else d.innerHTML=md(text); log.appendChild(d); log.scrollTop=log.scrollHeight; return d; }
+  function addTable(t){
+    var w=document.createElement("div"); w.className="b a"; w.style.maxWidth="97%"; w.style.padding="10px"; var h="";
+    if(t.title) h+='<div style="font-weight:700;margin-bottom:6px">'+esc(t.title)+"</div>";
+    h+='<div style="overflow-x:auto"><table>';
+    h+="<tr>"+t.headers.map(function(x){return '<th style="text-align:left;padding:5px 6px;border-bottom:2px solid '+BRAND+'">'+esc(x)+"</th>";}).join("")+"</tr>";
+    t.rows.forEach(function(r,i){ h+='<tr style="background:'+(i%2?"#f5f7fa":"#fff")+'">'+r.map(function(c,ci){return '<td style="padding:5px 6px;border-bottom:1px solid #eee;'+(ci===r.length-1?"font-weight:700;color:"+BRAND:"")+'">'+esc(c)+"</td>";}).join("")+"</tr>"; });
+    h+="</table></div>"; if(t.note) h+='<div style="margin-top:6px;font-size:12px;color:#888">'+esc(t.note)+"</div>";
+    w.innerHTML=h; log.appendChild(w); log.scrollTop=log.scrollHeight;
+  }
+  function openContact(){ try{window.open(ZALO_LINK,"_blank");}catch(e){} add("assistant","Dạ anh/chị bấm vào cửa sổ Zalo em vừa mở để chat với nhân viên nhé. Nếu không dùng Zalo, gọi giúp em số **"+STAFF_PHONE+"** ạ."); }
+  function showButtons(list){ btns.innerHTML=""; (list||[]).forEach(function(b){ var e=document.createElement("button"); e.textContent=b.title; e.onclick=function(){ if(b.payload==="CONTACT")openContact(); else send(b.title); }; btns.appendChild(e); }); }
+  function send(text){
+    if(!text||loading)return;
+    add("user",text); messages.push({role:"user",content:text}); showButtons([]); input.value=""; loading=true;
+    add("assistant","Đang soạn…"); var think=log.lastChild;
+    fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages,sessionId:sessionId})})
+      .then(function(r){return r.json();})
+      .then(function(data){ if(think)think.remove(); var reply=data.reply||data.error||"(không có phản hồi)"; add("assistant",reply); messages.push({role:"assistant",content:reply}); if(data.table)addTable(data.table); showButtons(data.buttons); })
+      .catch(function(e){ if(think)think.remove(); add("assistant","Lỗi kết nối: "+e); })
+      .then(function(){ loading=false; });
+  }
+  document.getElementById("f").addEventListener("submit",function(e){ e.preventDefault(); send(input.value.trim()); });
+  add("assistant","Dạ em chào anh/chị! Em là trợ lý VNGROW. Mình muốn gửi hàng đi nước nào, nặng khoảng bao nhiêu kg ạ?");
+})();
+</script>
+</body>
+</html>

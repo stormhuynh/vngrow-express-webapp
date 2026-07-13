@@ -1587,7 +1587,11 @@ loadCountries();
     + "#vg-btns button{border:1px solid " + BRAND + ";color:" + BRAND + ";background:#fff;padding:7px 12px;border-radius:18px;font-size:13px;cursor:pointer}"
     + "#vg-form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #eee}"
     + "#vg-input{flex:1;padding:10px 12px;border:1px solid #ccc;border-radius:20px;font-size:14px;outline:none}"
-    + "#vg-send{background:" + BRAND + ";color:#fff;border:0;padding:0 16px;border-radius:20px;cursor:pointer;font-weight:600}";
+    + "#vg-send{background:" + BRAND + ";color:#fff;border:0;padding:0 16px;border-radius:20px;cursor:pointer;font-weight:600}"
+    + "#vg-head .tools{display:flex;align-items:center;gap:12px}"
+    + "#vg-maxbtn{cursor:pointer;font-size:16px;opacity:.9;line-height:1}"
+    + "#vg-panel.max{width:min(760px,96vw);height:92vh}"
+    + "@media(max-width:640px){#vg-panel{right:0;bottom:0;width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0}#vg-fab{right:14px;bottom:14px}}";
   document.head.appendChild(css);
 
   var fab = document.createElement("button");
@@ -1597,7 +1601,7 @@ loadCountries();
   var panel = document.createElement("div");
   panel.id = "vg-panel";
   panel.innerHTML = ""
-    + '<div id="vg-head"><span>VNGROW · Báo giá gửi hàng</span><span class="x">&times;</span></div>'
+    + '<div id="vg-head"><span>VNGROW · Báo giá gửi hàng</span><span class="tools"><span id="vg-maxbtn" title="Phóng to / thu nhỏ">⛶</span><span class="x">&times;</span></span></div>'
     + '<div id="vg-log"></div>'
     + '<div id="vg-btns"></div>'
     + '<form id="vg-form"><input id="vg-input" placeholder="Nhập tin nhắn..." autocomplete="off"/><button id="vg-send" type="submit">Gửi</button></form>';
@@ -1621,14 +1625,14 @@ loadCountries();
     wrap.className = "vg-b vg-a"; wrap.style.maxWidth = "97%"; wrap.style.padding = "10px";
     var html = "";
     if (t.title) html += '<div style="font-weight:700;margin-bottom:6px">' + esc(t.title) + "</div>";
-    html += '<table style="border-collapse:collapse;width:100%;font-size:12.5px">';
+    html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="border-collapse:collapse;width:100%;min-width:320px;font-size:12.5px">';
     html += "<tr>" + t.headers.map(function (h) { return '<th style="text-align:left;padding:5px 6px;border-bottom:2px solid ' + BRAND + '">' + esc(h) + "</th>"; }).join("") + "</tr>";
     t.rows.forEach(function (r, i) {
       html += '<tr style="background:' + (i % 2 ? "#f5f7fa" : "#fff") + '">' + r.map(function (c, ci) {
         return '<td style="padding:5px 6px;border-bottom:1px solid #eee;' + (ci === r.length - 1 ? "font-weight:700;color:" + BRAND : "") + '">' + esc(c) + "</td>";
       }).join("") + "</tr>";
     });
-    html += "</table>";
+    html += "</table></div>";
     if (t.note) html += '<div style="margin-top:6px;font-size:12px;color:#888">' + esc(t.note) + "</div>";
     wrap.innerHTML = html;
     log.appendChild(wrap); log.scrollTop = log.scrollHeight;
@@ -1667,7 +1671,8 @@ loadCountries();
 
   fab.onclick = function () { panel.classList.add("open"); fab.style.display = "none";
     if (!log.childNodes.length) add("assistant", "Dạ em chào anh/chị! Em là trợ lý VNGROW. Mình muốn gửi hàng đi nước nào, nặng khoảng bao nhiêu kg ạ?"); };
-  panel.querySelector(".x").onclick = function () { panel.classList.remove("open"); fab.style.display = "block"; };
+  panel.querySelector(".x").onclick = function () { panel.classList.remove("open"); panel.classList.remove("max"); fab.style.display = "block"; };
+  panel.querySelector("#vg-maxbtn").onclick = function () { panel.classList.toggle("max"); };
   panel.querySelector("#vg-form").addEventListener("submit", function (e) { e.preventDefault(); send(input.value.trim()); });
 })();
 </script>
