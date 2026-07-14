@@ -1001,6 +1001,11 @@ function updateRFQWeights() {
 // ============================================================
 // CALCULATE RATES (Hỗ trợ oversize checks đa kiện)
 // ============================================================
+// Đếm số lần gọi calculateRates để bỏ qua response của các lần gọi cũ hơn
+// (vd: sửa nhanh nhiều trường liên tiếp tạo nhiều request chạy song song,
+// request cũ trả lời chậm hơn không được ghi đè lên kết quả mới nhất).
+let _calcSeq = 0;
+
 function calculateRates(doScroll = true) {
   const countryName = document.getElementById('selectedCountry').value;
   if (!countryName) { showToast('Vui lòng chọn quốc gia đến', 'error'); return; }
@@ -1044,12 +1049,14 @@ function calculateRates(doScroll = true) {
   if (doScroll) section.scrollIntoView({behavior:'smooth', block:'start'});
   else requestAnimationFrame(() => window.scrollTo({top: savedY, behavior:'instant'}));
 
+  const seq = ++_calcSeq;
   const packages = piecesArray.map(p => ({ qty: p.qty, weight: p.gw, L: p.l, W: p.w, H: p.h }));
   const url = `${CONFIG.APPS_SCRIPT_URL}?action=getRates&country=${encodeURIComponent(countryName)}&cargo_code=${cargoCode}&direction=export&packages=${encodeURIComponent(JSON.stringify(packages))}`;
 
   fetch(url)
     .then(r => r.json())
     .then(res => {
+      if (seq !== _calcSeq) return; // đã có request mới hơn, bỏ qua kết quả cũ
       if (!res.success || !res.data?.rates?.length) {
         container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Chưa có bảng giá cho quốc gia này. Vui lòng liên hệ nhân viên VNGROW.</div>';
         return;
@@ -1057,6 +1064,7 @@ function calculateRates(doScroll = true) {
       renderRateCards(container, res.data.rates, countryName, savedY, doScroll);
     })
     .catch(() => {
+      if (seq !== _calcSeq) return;
       container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Không thể tải bảng giá. Vui lòng thử lại.</div>';
     });
 }
