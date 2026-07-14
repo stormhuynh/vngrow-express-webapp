@@ -36,7 +36,6 @@ const tools = [
         cargo_group: { type: "string", enum: ["normal", "cosmetics", "food", "electricity", "document", "plan", "other"] },
         origin_city: { type: "string", enum: ["HCM", "HN"] },
         direction: { type: "string", enum: ["export", "import"] },
-        invoice_vat: { type: "boolean" },
         packages: {
           type: "array",
           items: {
