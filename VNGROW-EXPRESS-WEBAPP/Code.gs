@@ -211,50 +211,6 @@ function normalizeZone(raw) {
   return 'zone_' + s;
 }
 
-function lookupRateNew(sheetName, cargoCode, cw, zoneHeader) {
-  const sheet = getSheet(sheetName);
-  if (!sheet) return null;
-
-  const zone = normalizeZone(zoneHeader);
-  if (!zone) return null;
-
-  const [headers, ...rows] = sheet.getDataRange().getValues();
-  
-  let zoneCol = zone
-    ? headers.findIndex(h => String(h).trim().toLowerCase() === zone.toLowerCase())
-    : -1;
-  if (zoneCol === -1) {
-    zoneCol = headers.findIndex(h => String(h).trim().toLowerCase() === String(zoneHeader).trim().toLowerCase());
-  }
-  if (zoneCol === -1) return null;
-
-  const cargoCol = headers.findIndex(h => String(h).trim().toLowerCase() === 'cargo_code');
-  const typeCol  = headers.findIndex(h => String(h).trim().toLowerCase() === 'price_type');
-  const fromCol  = headers.findIndex(h => String(h).trim().toLowerCase() === 'weight_from');
-  const toCol    = headers.findIndex(h => String(h).trim().toLowerCase() === 'weight_to');
-
-  if (cargoCol === -1 || fromCol === -1 || toCol === -1) return null;
-
-  // Lọc tìm khoảng cân khớp
-  for (const r of rows) {
-    const rCargo = String(r[cargoCol]).trim().toLowerCase();
-    const rType  = typeCol !== -1 ? String(r[typeCol]).trim().toLowerCase() : 'flat';
-    const rFrom  = parseFloat(String(r[fromCol]).replace(',', '.'));
-    const rTo    = parseFloat(String(r[toCol]).replace(',', '.'));
-    const rateVal = Number(r[zoneCol]);
-
-    if (rCargo === cargoCode.trim().toLowerCase() && rFrom <= cw && cw <= rTo) {
-      if (rateVal > 0) {
-        return {
-          rate: rateVal,
-          price_type: rType
-        };
-      }
-    }
-  }
-  return null;
-}
-
 // ============================================================
 // CALCULATE SURCHARGES (DYNAMICAL & TIERED FILTER)
 // ============================================================
@@ -409,143 +365,144 @@ function calculateSurcharges(service, cargoCode, cw, pieces, origin, destination
 }
 
 // ============================================================
-// DYNAMIC RATE LOOKUP & GET RATES
+// GET RATES v2 — 1 nguồn giá cho Form + Chatbot
+// Base (đã gồm fuel) + surcharge theo hàng + VAT trên (base+surcharge).
+// KHÔNG cộng fuel riêng (đã gồm sẵn trong base).
 // ============================================================
 
+var _rateCache = {};
+function _rateRows(sheetName) {
+  if (_rateCache[sheetName]) return _rateCache[sheetName];
+  var sh = getSheet(sheetName);
+  if (!sh) return (_rateCache[sheetName] = null);
+  var vals = sh.getDataRange().getValues();
+  var H = vals[0].map(function (h) { return String(h).trim().toLowerCase(); });
+  var out = vals.slice(1).map(function (r) {
+    var o = {}; H.forEach(function (h, i) { o[h] = r[i]; }); return o;
+  });
+  return (_rateCache[sheetName] = out);
+}
+
+function _findCountry(cmap, q) {
+  var c = String(q || '').trim().toLowerCase();
+  var hit = cmap.find(function (r) {
+    return String(r.country_name).trim().toLowerCase() === c ||
+           String(r.country_code).trim().toLowerCase() === c;
+  });
+  if (hit) return hit;
+  return cmap.find(function (r) {
+    var al = String(r.aliases_vietnamese || '').toLowerCase();
+    return al && al.split(/[;,|]/).map(function (x) { return x.trim(); }).indexOf(c) >= 0;
+  }) || null;
+}
+
+function _vatPct(direction) {
+  var v = sheetToObjects('VAT').find(function (r) { return String(r.direction).trim() === direction; });
+  return v ? (Number(v.vat_pct) || 0) : (direction === 'export' ? 0.08 : 0);
+}
+
+function _dedupeServices(sr) {
+  var seen = {}, out = [];
+  sr.forEach(function (s) { var k = String(s.service_code).trim(); if (!seen[k]) { seen[k] = 1; out.push(s); } });
+  return out;
+}
+
+function _lookupBase(sheetName, baseCargo, cw, zone, keyType, mapVal) {
+  var rr = _rateRows(sheetName); if (!rr) return null;
+  var key = (keyType === 'country' ? String(mapVal) : String(zone)).trim().toLowerCase();
+  var row = rr.find(function (r) {
+    return String(r.cargo_code).trim().toLowerCase() === String(baseCargo).toLowerCase() &&
+           Number(r.weight_from) <= cw && cw <= Number(r.weight_to);
+  });
+  if (!row) return null;
+  var cell = Number(row[key]);
+  if (!cell) return null;
+  return String(row.price_type).trim().toLowerCase() === 'per_kg' ? cell * cw : cell;
+}
+
+function _computeSurcharge(surKey, cargoCode, packages, cw, originCity) {
+  var all = sheetToObjects('SURCHARGE').filter(function (s) {
+    return String(s.service_code).trim() === surKey &&
+           ['all', cargoCode].indexOf(String(s.cargo_code).trim()) >= 0;
+  });
+  var maxSide = Math.max.apply(null, [0].concat(packages.map(function (p) { return Math.max(+p.L || 0, +p.W || 0, +p.H || 0); })));
+  var maxPiece = Math.max.apply(null, [0].concat(packages.map(function (p) { return +p.weight || 0; })));
+  var totalPkg = packages.reduce(function (a, p) { return a + (+p.qty || 1); }, 0);
+  var totalKg = packages.reduce(function (a, p) { return a + (+p.weight || 0) * (+p.qty || 1); }, 0);
+  function amt(s, n) {
+    var a = Number(s.surcharge_amount) || 0, b = String(s.billing_basis || '').trim();
+    var v = b === 'per_kg' ? a * cw : b === 'per_package' ? a * n : b === 'per_all_package' ? a * totalPkg : a;
+    return Math.max(v, Number(s.min_surcharge_amount) || 0);
+  }
+  function pick(arr) { return arr.reduce(function (b, s) { return Number(s.threshold_value) > Number((b || {}).threshold_value != null ? b.threshold_value : -1) ? s : b; }, null); }
+  var addons = [], optional = [];
+  var sideTop = pick(all.filter(function (s) { return s.condition === 'longest_side' && maxSide > Number(s.threshold_value); }));
+  if (sideTop) { var n1 = packages.filter(function (p) { return Math.max(+p.L || 0, +p.W || 0, +p.H || 0) > Number(sideTop.threshold_value); }).length; addons.push({ name: sideTop.surcharge_type, amount: amt(sideTop, n1) }); }
+  var wTop = pick(all.filter(function (s) { return s.condition === 'over_weight' && maxPiece > Number(s.threshold_value); }));
+  if (wTop) { var n2 = packages.filter(function (p) { return (+p.weight || 0) > Number(wTop.threshold_value); }).length; addons.push({ name: wTop.surcharge_type, amount: amt(wTop, n2) }); }
+  var originRe = originCity === 'HN' ? /Ha Noi/i : /Ho Chi Minh/i;
+  var hTop = pick(all.filter(function (s) { return s.condition === 'piece_weight' && maxPiece >= Number(s.threshold_value) && originRe.test(String(s.note || '')); }));
+  if (hTop) addons.push({ name: hTop.surcharge_type, amount: amt(hTop, totalPkg) });
+  var quar = all.filter(function (s) { return s.condition === 'not_over_weight' && totalKg <= Number(s.threshold_value); });
+  if (quar.length) { var q = quar.reduce(function (a, b) { return Number(b.threshold_value) < Number(a.threshold_value) ? b : a; }); addons.push({ name: q.surcharge_type, amount: amt(q, 1) }); }
+  all.forEach(function (s) {
+    if (s.condition === 'manual' && String(s.cargo_code).trim() === cargoCode && cargoCode !== 'normal')
+      optional.push({ name: s.surcharge_type, amount: amt(s, totalPkg), note: s.note });
+  });
+  return { addons: addons, optional: optional, total: addons.reduce(function (a, x) { return a + x.amount; }, 0) };
+}
+
 function getRates(params) {
-  const country    = params.country    || '';
-  const cargoCode  = params.cargo_code || 'normal';
-  const cw         = parseFloat(params.cw) || 0;
-  const direction  = params.direction  || 'export';
-  const origin     = params.origin      || 'HCM'; // Mặc định HCM
-  const pieces     = params.pieces      || '';
-
+  var country = params.country || '';
+  var cargoCode = params.cargo_code || 'normal';
+  var direction = params.direction || 'export';
+  var originCity = String(params.origin_city || 'HCM').toUpperCase();
+  var packages = params.packages;
+  if (typeof packages === 'string') { try { packages = JSON.parse(packages); } catch (e) { packages = []; } }
+  if (!Array.isArray(packages) || !packages.length) return { error: 'Thiếu packages' };
   if (!country) return { error: 'Thiếu tên quốc gia' };
-  if (cw <= 0)  return { error: 'CW phải > 0' };
 
-  // Tra cứu Zone Mapping
-  const countries  = sheetToObjects('COUNTRY_ZONE_MAPPING');
-  const countryRow = countries.find(r => (r.country_name || r.country || '').trim().toLowerCase() === country.trim().toLowerCase());
-  if (!countryRow) return { error: 'Không tìm thấy quốc gia: ' + country };
+  var cmap = sheetToObjects('COUNTRY_ZONE_MAPPING');
+  var crow = _findCountry(cmap, country);
+  if (!crow) return { error: 'Không tìm thấy quốc gia: ' + country };
 
-  const cfg = getConfig();
-  let vatPct = cfg.vat[direction] !== undefined ? cfg.vat[direction] : (direction === 'export' ? 8 : 0);
+  var vat = _vatPct(direction);
+  var registry = _dedupeServices(sheetToObjects('SERVICE_REGISTRY'));
+  var rates = [], notServed = [], gw = 0, vw = 0;
 
-  // Danh sách dịch vụ được tự động cấu hình động
-  const SERVICES_LIST = [
-    { name: 'DHL',           sheet: 'DHL_RATE'           },
-    { name: 'FedEx IE',      sheet: 'FEDEX_IE_RATE'      },
-    { name: 'FedEx IP',      sheet: 'FEDEX_IP_RATE'      },
-    { name: 'UPS Saver',     sheet: 'UPS_SAVER_RATE'     },
-    { name: 'UPS Expedited', sheet: 'UPS_EXPEDITED_RATE' },
-    { name: 'EMS',           sheet: 'EMS_RATE'           },
-    { name: 'Viettel Post',  sheet: 'VIETTEL_POST_RATE'  }
-  ];
-
-  const results = [];
-
-  for (const svc of SERVICES_LIST) {
-    const zoneKey = serviceToZoneKey(svc.name);
-    if (!zoneKey) continue;
-
-    const zoneHeader = countryRow[zoneKey];
-    if (!zoneHeader || zoneHeader === '' || zoneHeader === '—') continue;
-
-    // Tìm kiếm bảng giá nền (mặc định lấy theo normal làm giá nền)
-    let res = lookupRateNew(svc.sheet, cargoCode, cw, zoneHeader);
-    if (!res && cargoCode !== 'normal') {
-      // Fallback về normal làm cước nền
-      res = lookupRateNew(svc.sheet, 'normal', cw, zoneHeader);
-    }
-    
-    if (res === null) continue;
-
-    let baseFreight = res.rate;
-    if (res.price_type === 'per_kg') {
-      baseFreight *= cw;
-    }
-
-    // Tính toán các phụ phí động từ SURCHARGE
-    const activeSurcharges = calculateSurcharges(svc.name, cargoCode, cw, pieces, origin, country);
-    let surchargesTotal = 0;
-    activeSurcharges.forEach(s => {
-      surchargesTotal += s.amount;
+  registry.forEach(function (svc) {
+    if (String(svc.status).trim() !== 'active') return;
+    var divisor = Number(svc.vol_divisor) || 5000, step = Number(svc.weight_round_step) || 0.5;
+    var g = 0, v = 0;
+    packages.forEach(function (pk) {
+      var q = +pk.qty || 1; g += (+pk.weight || 0) * q;
+      var L = +pk.L || 0, W = +pk.W || 0, H = +pk.H || 0;
+      if (L && W && H) v += (L * W * H / divisor) * q;
     });
+    var cw = Math.max(g, v); cw = step > 0 ? Math.ceil(cw / step) * step : cw;
+    gw = g; vw = Math.round(v * 100) / 100;
 
-    const fcfg     = cfg.fuel[svc.name] || { fuel_pct: 0, transit_min: 0, transit_max: 0 };
-    const fuel     = baseFreight * (fcfg.fuel_pct / 100); // Phụ phí xăng dầu chỉ nhân trên cước nền
-    const subtotal = baseFreight + surchargesTotal;       // Subtotal cước + phụ phí
-    const vat      = (subtotal + fuel) * (vatPct / 100);  // Thuế VAT tính trên tổng
-    const total    = subtotal + fuel + vat;
-
-    results.push({
-      service:            svc.name,
-      zone:               zoneHeader,
-      rate_per_kg:        res.rate,
-      price_type:         res.price_type,
-      chargeable_weight:  cw,
-      freight:            Math.round(baseFreight),
-      fuel_surcharge:     Math.round(fuel),
-      fuel_pct:           fcfg.fuel_pct,
-      surcharges:         activeSurcharges,
-      surcharges_total:   Math.round(surchargesTotal),
-      vat:                Math.round(vat),
-      vat_pct:            vatPct * 100,
-      total:              Math.round(total),
-      transit_min:        fcfg.transit_min,
-      transit_max:        fcfg.transit_max,
+    if (!svc.rate_tab) { notServed.push(svc.service_name); return; }
+    var mapCol = String(svc.mapping_column).trim().toLowerCase();
+    var mapVal = crow[mapCol];
+    var zone = normalizeZone(mapVal);
+    if (!zone && svc.rate_key_type !== 'country') { notServed.push(svc.service_name); return; }
+    var base = _lookupBase(svc.rate_tab, svc.base_cargo_code || 'normal', cw, zone, svc.rate_key_type, mapVal);
+    if (base === null) { notServed.push(svc.service_name); return; }
+    var sur = _computeSurcharge(String(svc.surcharge_service_key).trim(), cargoCode, packages, cw, originCity);
+    var subtotal = base + sur.total;
+    var vatAmt = Math.round(subtotal * vat);
+    rates.push({
+      service: svc.service_code, service_name: svc.service_name, zone: zone || String(mapVal), cw: cw,
+      base: Math.round(base),
+      addons: sur.addons.map(function (a) { return { name: a.name, amount: Math.round(a.amount) }; }),
+      surcharge_total: Math.round(sur.total), optional: sur.optional,
+      vat: vatAmt, vat_pct: vat, total: subtotal + vatAmt
     });
-  }
+  });
 
-  // Chuyên tuyến (Special Route)
-  const srZone = countryRow.special_route || country;
-  let srRes = lookupRateNew('SPECIAL_ROUTE_RATE', cargoCode, cw, srZone);
-  if (!srRes && cargoCode !== 'normal') {
-    srRes = lookupRateNew('SPECIAL_ROUTE_RATE', 'normal', cw, srZone);
-  }
-
-  if (srRes !== null) {
-    let srBase = srRes.rate;
-    if (srRes.price_type === 'per_kg') {
-      srBase *= cw;
-    }
-
-    const activeSurcharges = calculateSurcharges('Special Route', cargoCode, cw, pieces, origin, country);
-    let surchargesTotal = 0;
-    activeSurcharges.forEach(s => {
-      surchargesTotal += s.amount;
-    });
-
-    const fcfg    = cfg.fuel['Special Route'] || { fuel_pct: 0, transit_min: 10, transit_max: 12 };
-    const fuel    = srBase * (fcfg.fuel_pct / 100);
-    const subtotal = srBase + surchargesTotal;
-    const vat      = (subtotal + fuel) * 0.0; // Chuyên tuyến mặc định VAT 0%
-    const total   = subtotal + fuel + vat;
-
-    results.push({
-      service:           'Special Route',
-      zone:              srZone,
-      rate_per_kg:       srRes.rate,
-      price_type:        srRes.price_type,
-      chargeable_weight: cw,
-      freight:           Math.round(srBase),
-      fuel_surcharge:    Math.round(fuel),
-      fuel_pct:          fcfg.fuel_pct,
-      surcharges:        activeSurcharges,
-      surcharges_total:  Math.round(surchargesTotal),
-      vat:               0,
-      vat_pct:           0,
-      total:             Math.round(total),
-      transit_min:       fcfg.transit_min,
-      transit_max:       fcfg.transit_max,
-    });
-  }
-
-  // Hỗ trợ cảnh báo quá khổ từ bảng SURCHARGE
-  const oversizeWarnings = checkOversize(params, results.map(r => r.service));
-
-  results.sort((a, b) => a.total - b.total);
-  return { rates: results, oversize_warnings: oversizeWarnings };
+  rates.sort(function (a, b) { return a.total - b.total; });
+  return { rates: rates, not_served: notServed, gw: gw, vw: Math.round(vw * 100) / 100 };
 }
 
 function debugRates(params) {

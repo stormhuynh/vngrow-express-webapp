@@ -721,13 +721,12 @@ const COUNTRY_MAP = {
 };
 
 const SERVICE_INFO = {
-  'DHL':           {icon:'🟡', color:'orange'},
-  'FedEx IE':      {icon:'🟣', color:'blue'},
-  'FedEx IP':      {icon:'🟣', color:'blue'},
-  'UPS Saver':     {icon:'🟤', color:'green'},
-  'UPS Expedited': {icon:'🟤', color:'green'},
-  'EMS':           {icon:'🟢', color:'green'},
-  'Special Route': {icon:'✈️', color:'blue', featured:true},
+  'DHL':       {icon:'🟡', color:'orange'},
+  'FEDEX_IE':  {icon:'🟣', color:'blue'},
+  'FEDEX_IP':  {icon:'🟣', color:'blue'},
+  'EMS':       {icon:'🟢', color:'green'},
+  'VIETTEL':      {icon:'🟤', color:'green'},
+  'SPECIAL_ROUTE': {icon:'✈️', color:'blue', featured:true},
 };
 
 // ============================================================
@@ -783,7 +782,11 @@ function filterCountries(q) {
   const filtered = q ? COUNTRIES.filter(c => {
     const name = c.country_name || c.country || '';
     const displayName = COUNTRY_MAP[name] || name;
-    return name.toLowerCase().includes(q.toLowerCase()) || displayName.toLowerCase().includes(q.toLowerCase());
+    const query = q.toLowerCase();
+    const aliases = String(c.aliases_vietnamese || '').toLowerCase();
+    return name.toLowerCase().includes(query) ||
+           displayName.toLowerCase().includes(query) ||
+           aliases.includes(query);
   }) : COUNTRIES;
   renderCountryOptions(filtered);
   document.getElementById('countryDropdown').classList.add('open');
@@ -1029,8 +1032,9 @@ function calculateRates(doScroll = true) {
   if (doScroll) section.scrollIntoView({behavior:'smooth', block:'start'});
   else requestAnimationFrame(() => window.scrollTo({top: savedY, behavior:'instant'}));
 
-  const url = `${CONFIG.APPS_SCRIPT_URL}?action=getRates&country=${encodeURIComponent(countryName)}&cargo_code=${cargoCode}&cw=${chargeableKg}&direction=export&pieces=${encodeURIComponent(JSON.stringify(piecesArray))}`;
-  
+  const packages = piecesArray.map(p => ({ qty: p.qty, weight: p.gw, L: p.l, W: p.w, H: p.h }));
+  const url = `${CONFIG.APPS_SCRIPT_URL}?action=getRates&country=${encodeURIComponent(countryName)}&cargo_code=${cargoCode}&direction=export&packages=${encodeURIComponent(JSON.stringify(packages))}`;
+
   fetch(url)
     .then(r => r.json())
     .then(res => {
@@ -1038,31 +1042,22 @@ function calculateRates(doScroll = true) {
         container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Chưa có bảng giá cho quốc gia này. Vui lòng liên hệ nhân viên VNGROW.</div>';
         return;
       }
-      renderRateCards(container, res.data.rates, countryName, chargeableKg, savedY, doScroll, res.data.oversize_warnings || []);
+      renderRateCards(container, res.data.rates, countryName, savedY, doScroll);
     })
     .catch(() => {
       container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Không thể tải bảng giá. Vui lòng thử lại.</div>';
     });
 }
 
-function renderRateCards(container, rates, countryName, cw, savedY, doScroll, oversizeWarnings) {
+function renderRateCards(container, rates, countryName, savedY, doScroll) {
   const cards = rates.map((r, idx) => {
     const info = SERVICE_INFO[r.service] || {icon:'📦', color:'blue', featured:false};
     const isFeatured = info.featured || idx === 0;
-    const transitText = r.transit_min && r.transit_max
-      ? `${r.transit_min}–${r.transit_max} ngày làm việc`
-      : '';
-    const safeName = r.service.replace(/'/g, "\\'");
+    const displayName = r.service_name || r.service;
+    const safeName = displayName.replace(/'/g, "\\'");
     const safeCountry = countryName.replace(/'/g, "\\'");
-    
-    // Lọc cảnh báo quá khổ riêng cho hãng này
-    const svcWarnings = oversizeWarnings.filter(w => w.service === r.service);
-    const warningHtml = svcWarnings.length > 0
-      ? `<div style="background:#FFF5F5;border:1.5px solid #FFCDD2;color:#e53935;font-size:11px;font-weight:700;padding:6px 10px;border-radius:6px;margin-bottom:12px;display:flex;align-items:center;gap:6px">
-           <span>⚠️</span> 
-           <span>Hàng quá khổ: ${svcWarnings.map(w => `${w.condition} > ${w.threshold} ${w.unit}`).join(', ')}</span>
-         </div>`
-      : '';
+    const vatPctDisplay = Math.round((r.vat_pct || 0) * 100);
+    const surchargeNote = r.surcharge_total > 0 ? ` + Phụ phí ${formatVND(r.surcharge_total)}` : '';
 
     return `
       <div class="service-card ${isFeatured?'featured':''}">
@@ -1071,24 +1066,22 @@ function renderRateCards(container, rates, countryName, cw, savedY, doScroll, ov
           <div class="sc-header">
             <div class="sc-logo">${info.icon}</div>
             <div>
-              <div class="sc-name">${r.service}</div>
-              ${transitText ? `<div class="sc-sub">🕐 ${transitText}</div>` : ''}
+              <div class="sc-name">${displayName}</div>
             </div>
           </div>
           <div class="sc-price">${formatVND(r.total)}</div>
           <div class="sc-price-note">
-            Cước gốc ${formatVND(r.freight)} + Xăng dầu ${r.fuel_pct}%
-            ${r.vat_pct > 0 ? ` + Thuế VAT ${r.vat_pct}%` : ' + Thuế VAT 0%'}
-            · CW ${cw.toFixed(2)} kg
+            Cước gốc ${formatVND(r.base)}${surchargeNote}
+            ${vatPctDisplay > 0 ? ` + Thuế VAT ${vatPctDisplay}%` : ' + Thuế VAT 0%'}
+            · CW ${r.cw.toFixed(2)} kg
           </div>
-          ${warningHtml}
           <div class="sc-footer">
             <button class="btn btn-outline btn-sm"
-              onclick='openConfirmModal("${safeName}","${safeName}",${r.total},"${safeCountry}",${cw})'>
+              onclick='openConfirmModal("${r.service}","${safeName}",${r.total},"${safeCountry}",${r.cw})'>
               Xác nhận báo giá
             </button>
             <button class="btn btn-primary btn-sm"
-              onclick='openBookingModal("${safeName}","${safeName}",${r.total},"${safeCountry}",${cw})'>
+              onclick='openBookingModal("${r.service}","${safeName}",${r.total},"${safeCountry}",${r.cw})'>
               📦 Booking
             </button>
           </div>
