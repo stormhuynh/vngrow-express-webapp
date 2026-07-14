@@ -778,14 +778,26 @@ function selectCountry(name, displayName) {
   autoCalculate();
 }
 
+// Bỏ dấu + gộp về cùng 1 dạng Unicode (NFC/NFD) để so khớp không phụ thuộc
+// bàn phím/gõ dấu của người dùng (vd: "mỹ" gõ trên các thiết bị khác nhau
+// có thể tạo ra chuỗi Unicode khác nhau dù nhìn giống hệt nhau).
+function normalizeSearchText(s) {
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/gi, 'd')
+    .toLowerCase()
+    .trim();
+}
+
 function filterCountries(q) {
   const filtered = q ? COUNTRIES.filter(c => {
     const name = c.country_name || c.country || '';
     const displayName = COUNTRY_MAP[name] || name;
-    const query = q.toLowerCase();
-    const aliases = String(c.aliases_vietnamese || '').toLowerCase();
-    return name.toLowerCase().includes(query) ||
-           displayName.toLowerCase().includes(query) ||
+    const query = normalizeSearchText(q);
+    const aliases = normalizeSearchText(c.aliases_vietnamese);
+    return normalizeSearchText(name).includes(query) ||
+           normalizeSearchText(displayName).includes(query) ||
            aliases.includes(query);
   }) : COUNTRIES;
   renderCountryOptions(filtered);

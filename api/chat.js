@@ -19,6 +19,8 @@ TÍNH GIÁ: LUÔN gọi tool compare_carriers để lấy bảng so sánh các h
 
 PHỤ PHÍ: chỉ nhắc phụ phí khi THỰC SỰ liên quan mặt hàng khách nói. Hàng thường (quần áo, giày, túi...) thì KHÔNG nhắc gì về gỗ, hun trùng, FDA. Đừng tự bịa tình huống phát sinh không liên quan.
 
+GIẢI THÍCH SỐ LIỆU (rất quan trọng): mọi con số (cước, phụ phí, VAT, tổng) đều do tool tính ra và là SỐ CHÍNH THỨC — KHÔNG tự tính lại, KHÔNG tự phủ nhận, KHÔNG mâu thuẫn giữa các lượt. Khi khách hỏi "phụ phí gồm gì / vì sao 10 triệu / cước gồm gì", hãy đọc mảng "addons" của hãng đó trong kết quả tool và liệt kê ĐÚNG từng khoản kèm số tiền, ví dụ: "Dạ phụ phí gồm: Phí quá khổ (kiện trên 68kg) 7.000.000đ + Phí kích thước (1 chiều trên 120cm) 700.000đ + Phí xử lý kho HCM 5.000đ ạ." TUYỆT ĐỐI KHÔNG nói "phụ phí = 0" khi tool có phụ phí, KHÔNG bịa "bảo hiểm/hải quan" nếu tool không có. Nếu addons rỗng thì phụ phí đúng bằng 0. Nếu khách hỏi khoản mà bạn không có dữ liệu, nói "để nhân viên xác nhận chi tiết" — đừng chế số.
+
 LƯU HỒ SƠ: khi có tên + SĐT hoặc vừa báo giá, gọi tool save_lead (kể cả khách chưa chốt).
 
 KẾT THÚC lịch sự, không đùa: mời khách theo hướng "Anh/chị muốn liên hệ nhân viên để hỏi thêm không ạ? Hoặc anh/chị để lại số điện thoại, em nhờ nhân viên gọi lại tư vấn kỹ hơn." Rồi để 2 nút bên dưới.`;
@@ -94,7 +96,12 @@ function buildTable(rows, dest) {
       r.vat ? fmtVND(r.vat) : "—",
       fmtVND(r.total),
     ]),
-    note: notServed.length ? ("Cần nhân viên báo giá riêng: " + notServed.join(", ")) : "",
+    note: [
+      served.filter((r) => r.addons && r.addons.length)
+        .map((r) => r.service_name + " — phụ phí gồm: " + r.addons.map((a) => a.name + " " + fmtVND(a.amount)).join(", "))
+        .join("\n"),
+      notServed.length ? ("Cần nhân viên báo giá riêng: " + notServed.join(", ")) : "",
+    ].filter(Boolean).join("\n"),
   };
 }
 
