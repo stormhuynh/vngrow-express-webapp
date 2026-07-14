@@ -1,6 +1,12 @@
 *.xlsx
 *.png
 !Logo VNGrow_Icon.png
+!favicon-16x16.png
+!favicon-32x32.png
+!apple-touch-icon.png
+!android-chrome-192x192.png
+!android-chrome-512x512.png
+!og-express.png
 pricing-1.png
 pricing-2.png
 booking.png
