@@ -6,11 +6,17 @@
 // ============================================================
 
 const SS_ID = '1lY0wWpwfuuV9GLiQq0ha7UwfQWhYdrf2o205-yLJQGc';
+// Spreadsheet CRM (chứa các tab LEAD, DEAL, RFQ, BOOKING, SHIPMENT...) — KHÁC spreadsheet pricing ở trên.
+const CRM_SS_ID = '1nBUJhnwWpFGgFhgrbrSfbG-Znife_5JXSSyLLSsmHVA';
 
 // ---- Helpers ------------------------------------------------
 
 function getSheet(name) {
   return SpreadsheetApp.openById(SS_ID).getSheetByName(name);
+}
+
+function getCrmSheet(name) {
+  return SpreadsheetApp.openById(CRM_SS_ID).getSheetByName(name);
 }
 
 function sheetToObjects(sheetName) {
@@ -60,6 +66,7 @@ function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
     switch (d.action) {
+      case 'saveLead':      return ok(saveLead(d));
       case 'submitRFQ':     return ok(submitRFQ(d));
       case 'submitBooking': return ok(submitBooking(d));
       default:              return err('Unknown action: ' + d.action);
@@ -333,6 +340,50 @@ function getTracking(id) {
     .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
   return { shipment, timeline };
+}
+
+// ============================================================
+// SAVE LEAD  (từ chatbot AI → tab LEAD của spreadsheet CRM)
+// Thứ tự cột phải KHỚP CHÍNH XÁC header tab LEAD:
+// id_deal | assigned_to | lead_status | id_lead | lead_name | tel | email |
+// cargo_description | destination_country | total_packages | total_gw | total_vw |
+// total_cw | origin_city | cargo_value | currency | source | channel |
+// created_at | note | price_quote | chat_id
+// ============================================================
+
+function saveLead(d) {
+  const sheet = getCrmSheet('LEAD');
+  if (!sheet) return { error: 'Không tìm thấy tab LEAD trong spreadsheet CRM' };
+
+  const id  = 'LEAD-' + Date.now();
+  const now = new Date();
+
+  sheet.appendRow([
+    '',                              // id_deal        (nội bộ CRM, để trống)
+    '',                              // assigned_to    (nội bộ, để trống)
+    d.lead_status || 'collecting',   // lead_status
+    id,                              // id_lead
+    d.lead_name || '',               // lead_name
+    d.tel || '',                     // tel
+    d.email || '',                   // email
+    d.cargo_description || '',       // cargo_description
+    d.destination_country || '',     // destination_country
+    d.total_packages || '',          // total_packages
+    d.total_gw || '',                // total_gw
+    d.total_vw || '',                // total_vw
+    d.total_cw || '',                // total_cw
+    d.origin_city || '',             // origin_city
+    d.cargo_value || '',             // cargo_value
+    d.currency || 'VND',             // currency
+    d.source || 'chatbot',           // source
+    d.channel || 'web-ai',           // channel
+    now,                             // created_at
+    d.note || '',                    // note
+    d.price_quote || '',             // price_quote
+    d.chat_id || '',                 // chat_id
+  ]);
+
+  return { id };
 }
 
 // ============================================================
