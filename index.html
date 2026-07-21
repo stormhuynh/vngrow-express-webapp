@@ -8,6 +8,9 @@
 <link rel="canonical" href="https://express.vngrow.com.vn/">
 <meta name="theme-color" content="#F69320">
 
+<!-- Đo lường: GA4 + Facebook Pixel (điền ID trong analytics.js) -->
+<script src="/analytics.js"></script>
+
 <!-- Favicons -->
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -1046,8 +1049,10 @@ function calculateRates(doScroll = true) {
       if (seq !== _calcSeq) return; // đã có request mới hơn, bỏ qua kết quả cũ
       if (!res.success || !res.data?.rates?.length) {
         container.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--gray-500)">Chưa có bảng giá cho quốc gia này. Vui lòng liên hệ nhân viên VNGROW.</div>';
+        if (window.vgTrack) vgTrack("quote_no_rate", { country: countryName });
         return;
       }
+      if (window.vgTrack) vgTrack("quote_calculated", { country: countryName, carriers: res.data.rates.length });
       renderRateCards(container, res.data.rates, countryName, savedY, doScroll);
     })
     .catch(() => {
@@ -1267,6 +1272,8 @@ function submitBooking() {
     hs_code:             getBookingPackageDetails().map(p => p.hs_code).filter(Boolean).join(', '),
     package_details:     getBookingPackageDetails(),
   });
+  if (window.vgTrack) vgTrack("booking_submit", { country: currentQuote.country || '', service: currentQuote.serviceKey || currentQuote.serviceName || '' });
+
   closeModal('modal-booking');
   showToast('🎉 Đặt hàng thành công! Nhân viên sẽ xác nhận trong 30 phút.', 'success');
 }
@@ -1550,6 +1557,8 @@ function submitRFQ(e) {
     special_requirements: data.notes || '',
   });
 
+  if (window.vgTrack) vgTrack("rfq_submit", { country: data.country || '', total_gw: d.totalGW.toFixed(2) });
+
   form.innerHTML = `
     <div class="card">
       <div class="success-box">
@@ -1713,9 +1722,11 @@ loadCountries();
     if (t.note) html += '<div style="margin-top:6px;font-size:12px;color:#888">' + esc(t.note) + "</div>";
     wrap.innerHTML = html;
     log.appendChild(wrap); log.scrollTop = log.scrollHeight;
+    if (window.vgTrack) vgTrack("chat_quote_shown");
   }
   function openContact() {
     try { window.open(ZALO_LINK, "_blank"); } catch (e) {}
+    if (window.vgTrack) vgTrack("contact_zalo_click", { from: "chat_widget" });
     add("assistant", "Dạ anh/chị bấm vào cửa sổ Zalo em vừa mở để chat trực tiếp với nhân viên nhé. Nếu mình không dùng Zalo, gọi giúp em số **" + STAFF_PHONE + "** ạ.");
   }
   function showButtons(list) {
@@ -1729,6 +1740,7 @@ loadCountries();
   }
   function send(text) {
     if (!text || loading) return;
+    if (window.vgTrack) vgTrack("chat_message");
     add("user", text); messages.push({ role: "user", content: text });
     showButtons([]); input.value = ""; loading = true; add("assistant", "Đang soạn…");
     var thinking = log.lastChild;
@@ -1747,6 +1759,7 @@ loadCountries();
   }
 
   fab.onclick = function () { panel.classList.add("open"); fab.style.display = "none";
+    if (window.vgTrack) vgTrack("chat_open");
     if (!log.childNodes.length) add("assistant", "Dạ em chào anh/chị! Em là trợ lý VNGROW. Mình muốn gửi hàng đi nước nào, nặng khoảng bao nhiêu kg ạ?"); };
   panel.querySelector(".x").onclick = function () { panel.classList.remove("open"); panel.classList.remove("max"); fab.style.display = "flex"; };
   panel.querySelector("#vg-maxbtn").onclick = function () { panel.classList.toggle("max"); };

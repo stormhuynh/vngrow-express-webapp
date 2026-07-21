@@ -25,6 +25,8 @@
   form button { background:var(--brand); color:#fff; border:0; padding:0 18px; border-radius:22px; cursor:pointer; font-weight:600; }
   table { border-collapse:collapse; width:100%; min-width:320px; font-size:12.5px; }
 </style>
+<!-- Đo lường: GA4 + Facebook Pixel (điền ID trong analytics.js) -->
+<script src="/analytics.js"></script>
 </head>
 <body>
 <div id="app">
@@ -52,11 +54,13 @@
     t.rows.forEach(function(r,i){ h+='<tr style="background:'+(i%2?"#f5f7fa":"#fff")+'">'+r.map(function(c,ci){return '<td style="padding:5px 6px;border-bottom:1px solid #eee;'+(ci===r.length-1?"font-weight:700;color:"+BRAND:"")+'">'+esc(c)+"</td>";}).join("")+"</tr>"; });
     h+="</table></div>"; if(t.note) h+='<div style="margin-top:6px;font-size:12px;color:#888">'+esc(t.note)+"</div>";
     w.innerHTML=h; log.appendChild(w); log.scrollTop=log.scrollHeight;
+    if(window.vgTrack)vgTrack("chat_quote_shown");
   }
-  function openContact(){ try{window.open(ZALO_LINK,"_blank");}catch(e){} add("assistant","Dạ anh/chị bấm vào cửa sổ Zalo em vừa mở để chat với nhân viên nhé. Nếu không dùng Zalo, gọi giúp em số **"+STAFF_PHONE+"** ạ."); }
+  function openContact(){ try{window.open(ZALO_LINK,"_blank");}catch(e){} if(window.vgTrack)vgTrack("contact_zalo_click",{from:"chat_page"}); add("assistant","Dạ anh/chị bấm vào cửa sổ Zalo em vừa mở để chat với nhân viên nhé. Nếu không dùng Zalo, gọi giúp em số **"+STAFF_PHONE+"** ạ."); }
   function showButtons(list){ btns.innerHTML=""; (list||[]).forEach(function(b){ var e=document.createElement("button"); e.textContent=b.title; e.onclick=function(){ if(b.payload==="CONTACT")openContact(); else send(b.title); }; btns.appendChild(e); }); }
   function send(text){
     if(!text||loading)return;
+    if(window.vgTrack)vgTrack("chat_message");
     add("user",text); messages.push({role:"user",content:text}); showButtons([]); input.value=""; loading=true;
     add("assistant","Đang soạn…"); var think=log.lastChild;
     fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages,sessionId:sessionId})})
@@ -68,6 +72,7 @@
   document.getElementById("f").addEventListener("submit",function(e){ e.preventDefault(); send(input.value.trim()); });
   document.getElementById("staff-btn").onclick = openContact;
   add("assistant","Dạ em chào anh/chị! Em là trợ lý VNGROW. Mình muốn gửi hàng đi nước nào, nặng khoảng bao nhiêu kg ạ?");
+  if(window.vgTrack)vgTrack("chat_page_view");
 })();
 </script>
 </body>
