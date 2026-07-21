@@ -1,0 +1,200 @@
+<!doctype html>
+<!-- =====================================================================
+     TEMPLATE LANDING PAGE THEO TUYẾN — VNGROW EXPRESS
+     Một file phục vụ nhiều URL: /gui-hang-di-my, /gui-hang-di-nhat, ...
+     Nội dung từng tuyến nằm trong biến ROUTES; JS đọc slug từ URL để đổi.
+     Muốn thêm tuyến: thêm 1 mục vào ROUTES + 1 dòng rewrite trong vercel.json.
+     ===================================================================== -->
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Gửi hàng đi quốc tế · VNGROW EXPRESS</title>
+<meta name="description" id="meta-desc" content="Gửi hàng đi quốc tế giá tốt, báo giá tức thì 24/7 cùng VNGROW EXPRESS." />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="/analytics.js"></script>
+<style>
+  :root { --brand:#1878C8; --accent:#F69320; --ink:#1a2330; --muted:#5b6673; --line:#e3e6ea; --bg:#eef2f6; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; font-family:Inter,system-ui,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
+  a { color:var(--brand); }
+  .wrap { max-width:900px; margin:0 auto; padding:0 18px; }
+  header.top { background:#fff; border-bottom:1px solid var(--line); }
+  header.top .wrap { padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  header.top .brand { font-weight:800; font-size:18px; color:var(--brand); }
+  header.top a.home { color:var(--muted); text-decoration:none; font-size:14px; font-weight:600; }
+  .hero { background:linear-gradient(135deg,var(--brand),#0f5fa0); color:#fff; }
+  .hero .wrap { padding:44px 18px 40px; text-align:center; }
+  .hero .flag { font-size:56px; line-height:1; margin-bottom:8px; }
+  .hero h1 { margin:0 0 10px; font-size:32px; font-weight:800; }
+  .hero p.sub { margin:0 auto 22px; font-size:17px; opacity:.94; max-width:620px; }
+  .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .btn { display:inline-block; text-decoration:none; font-weight:700; padding:13px 26px; border-radius:28px; font-size:16px; }
+  .btn-primary { background:var(--accent); color:#fff; box-shadow:0 6px 18px rgba(246,147,32,.4); }
+  .btn-ghost { background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.65); }
+  .section { background:#fff; border:1px solid var(--line); border-radius:16px; padding:26px; margin:22px 0; }
+  .section h2 { font-size:22px; color:var(--brand); margin:0 0 14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+  .feat { background:#f5f8fc; border-radius:12px; padding:16px; }
+  .feat .ic { font-size:26px; }
+  .feat h3 { margin:8px 0 4px; font-size:16px; }
+  .feat p { margin:0; font-size:14px; color:var(--muted); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { background:#eef4fb; color:var(--brand); border-radius:20px; padding:7px 14px; font-size:14px; font-weight:600; }
+  .carriers { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .carrier { background:#f5f7fa; border:1px solid var(--line); border-radius:10px; padding:10px 16px; font-weight:700; color:var(--muted); }
+  .faq details { border-bottom:1px solid var(--line); padding:12px 0; }
+  .faq summary { cursor:pointer; font-weight:700; font-size:15px; }
+  .faq p { margin:8px 0 0; color:var(--muted); font-size:14px; }
+  .cta { background:var(--brand); color:#fff; border-radius:18px; padding:30px; text-align:center; margin:24px 0 40px; }
+  .cta h2 { margin:0 0 8px; font-size:24px; color:#fff; }
+  .cta p { margin:0 0 16px; opacity:.92; }
+  .otherroutes { text-align:center; margin:18px 0; }
+  .otherroutes a { display:inline-block; margin:4px 8px; font-size:14px; }
+  footer { text-align:center; color:var(--muted); font-size:13px; padding:24px 18px 40px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <span class="brand">🚚 VNGROW EXPRESS</span>
+    <a class="home" href="/">Trang chủ →</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="flag" id="hero-flag">🌍</div>
+    <h1 id="hero-title">Gửi hàng đi quốc tế</h1>
+    <p class="sub" id="hero-sub">Báo giá tức thì với trợ lý AI · so sánh giá nhiều hãng · hỗ trợ 24/7.</p>
+    <div class="btns">
+      <a class="btn btn-primary" id="cta-chat" href="/chat">💬 Chat báo giá ngay</a>
+      <a class="btn btn-ghost" id="cta-zalo" href="#" target="_blank" rel="noopener">☎️ Zalo nhân viên</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="section">
+    <h2 id="why-title">Vì sao chọn VNGROW để gửi hàng?</h2>
+    <div class="grid">
+      <div class="feat"><div class="ic">⚡</div><h3>Báo giá trong 30 giây</h3><p>Trợ lý AI tính cước &amp; so sánh các hãng ngay, không cần chờ.</p></div>
+      <div class="feat"><div class="ic">💰</div><h3>Giá tốt nhiều lựa chọn</h3><p>So sánh DHL, FedEx, UPS, EMS và tuyến chuyên biệt để chọn mức phù hợp.</p></div>
+      <div class="feat"><div class="ic">📦</div><h3>Theo dõi hành trình</h3><p>Tra cứu vận đơn &amp; cập nhật trạng thái đơn hàng 24/7.</p></div>
+      <div class="feat"><div class="ic">🤝</div><h3>Nhân viên hỗ trợ tận tình</h3><p>Tư vấn đóng gói, chứng từ, thủ tục cho từng loại hàng.</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 id="items-title">Mặt hàng thường gửi</h2>
+    <div class="chips" id="items-chips"></div>
+  </div>
+
+  <div class="section">
+    <h2>Các hãng vận chuyển</h2>
+    <div class="carriers">
+      <div class="carrier">DHL</div><div class="carrier">FedEx</div><div class="carrier">UPS</div>
+      <div class="carrier">EMS</div><div class="carrier">Tuyến chuyên biệt</div>
+    </div>
+    <p style="color:var(--muted);font-size:14px;margin-top:12px">Thời gian vận chuyển tuỳ hãng &amp; dịch vụ — nhận thời gian và giá chính xác ngay trong khung chat báo giá.</p>
+  </div>
+
+  <div class="section faq">
+    <h2>Câu hỏi thường gặp</h2>
+    <div id="faq-list"></div>
+  </div>
+
+  <div class="cta">
+    <h2 id="cta-title">Nhận báo giá ngay hôm nay</h2>
+    <p id="cta-sub">Chat với trợ lý AI của VNGROW để có giá gửi hàng chỉ trong vài giây.</p>
+    <a class="btn btn-primary" id="cta-chat2" href="/chat">💬 Báo giá miễn phí</a>
+  </div>
+
+  <div class="otherroutes">
+    <span style="color:var(--muted);font-size:14px">Tuyến khác:</span>
+    <span id="other-routes"></span>
+  </div>
+
+</div>
+
+<footer>© VNGROW EXPRESS · Chuyển phát nhanh quốc tế · express.vngrow.com.vn</footer>
+
+<script>
+(function () {
+  var ZALO_LINK = "https://zalo.me/0353680297";
+
+  // Dữ liệu từng tuyến. Thêm tuyến mới ở đây + 1 dòng rewrite trong vercel.json.
+  var ROUTES = {
+    "my":        { vi:"Mỹ",       flag:"🇺🇸", items:["Quần áo","Đặc sản khô","Quà tặng Việt kiều","Mỹ phẩm","Thực phẩm khô"] },
+    "nhat":      { vi:"Nhật Bản", flag:"🇯🇵", items:["Thực phẩm khô","Quần áo","Hàng cho du học sinh","Đặc sản","Quà tặng"] },
+    "han":       { vi:"Hàn Quốc", flag:"🇰🇷", items:["Mỹ phẩm","Thực phẩm","Quần áo","Hàng du học sinh","Quà tặng"] },
+    "uc":        { vi:"Úc",       flag:"🇦🇺", items:["Đặc sản","Quà tặng","Hàng gửi du học sinh","Thực phẩm khô","Quần áo"] },
+    "canada":    { vi:"Canada",   flag:"🇨🇦", items:["Quà tặng","Hàng gửi định cư","Hàng du học sinh","Đặc sản","Quần áo"] },
+    "dai-loan":  { vi:"Đài Loan", flag:"🇹🇼", items:["Hàng gửi lao động","Thực phẩm","Quần áo","Hàng du học sinh","Quà tặng"] }
+  };
+
+  // Suy slug từ đường dẫn: /gui-hang-di-my -> "my"
+  var path = (location.pathname || "").replace(/\/+$/,"");
+  var m = path.match(/gui-hang-di-(.+)$/);
+  var slug = m ? m[1] : "";
+  var r = ROUTES[slug];
+
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function set(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; }
+
+  // Nút Zalo luôn có
+  var zaloEl = document.getElementById("cta-zalo"); if (zaloEl) zaloEl.href = ZALO_LINK;
+
+  if (r) {
+    var vi = r.vi;
+    document.title = "Gửi hàng đi " + vi + " giá tốt · Báo giá 24/7 · VNGROW EXPRESS";
+    var desc = "Gửi hàng đi " + vi + " nhanh, giá tốt cùng VNGROW EXPRESS. Báo giá tức thì với AI, so sánh DHL/FedEx/UPS/EMS, hỗ trợ 24/7.";
+    var md = document.getElementById("meta-desc"); if (md) md.setAttribute("content", desc);
+
+    set("hero-flag", r.flag);
+    set("hero-title", "Gửi hàng đi " + vi);
+    set("hero-sub", "Báo giá tức thì với trợ lý AI · so sánh giá nhiều hãng đi " + vi + " · hỗ trợ 24/7.");
+    set("why-title", "Vì sao chọn VNGROW để gửi hàng đi " + vi + "?");
+    set("items-title", "Mặt hàng thường gửi đi " + vi);
+    set("cta-title", "Gửi hàng đi " + vi + " — nhận báo giá ngay");
+
+    // Link chat mang theo nước đến để chatbot mở đúng tuyến
+    var chatHref = "/chat?to=" + encodeURIComponent(vi);
+    var c1=document.getElementById("cta-chat"), c2=document.getElementById("cta-chat2");
+    if (c1) { c1.href = chatHref; c1.textContent = "💬 Chat báo giá đi " + vi; }
+    if (c2) c2.href = chatHref;
+
+    // Chips mặt hàng
+    var chips = document.getElementById("items-chips");
+    if (chips) chips.innerHTML = r.items.map(function(i){ return '<span class="chip">'+esc(i)+'</span>'; }).join("");
+
+    // FAQ theo tuyến
+    var faqs = [
+      { q:"Gửi hàng đi "+vi+" mất bao lâu?", a:"Thời gian phụ thuộc hãng và dịch vụ bạn chọn. Nhập thông tin vào khung chat để nhận thời gian và giá chính xác cho lô hàng của bạn." },
+      { q:"Chi phí gửi hàng đi "+vi+" tính thế nào?", a:"Cước tính theo trọng lượng tính cước (lớn hơn giữa cân thực và cân quy đổi thể tích). Trợ lý AI sẽ so sánh giá nhiều hãng để bạn chọn mức tối ưu." },
+      { q:"Những mặt hàng nào gửi đi "+vi+" được?", a:"Đa số hàng cá nhân, quà tặng, quần áo, thực phẩm khô... đều gửi được. Một số mặt hàng hạn chế cần điều kiện — xem thêm tại trang Chính sách hoặc hỏi trực tiếp nhân viên." },
+      { q:"Có theo dõi được đơn hàng không?", a:"Có. VNGROW cung cấp mã vận đơn và tra cứu hành trình 24/7 trên website." }
+    ];
+    var fl = document.getElementById("faq-list");
+    if (fl) fl.innerHTML = faqs.map(function(f){
+      return '<details><summary>'+esc(f.q)+'</summary><p>'+esc(f.a)+'</p></details>';
+    }).join("");
+
+    if (window.vgTrack) vgTrack("landing_view", { route: slug, country: vi });
+  } else {
+    // Slug lạ: giữ nội dung mặc định, trỏ chat chung
+    if (window.vgTrack) vgTrack("landing_view", { route: slug || "unknown" });
+  }
+
+  // Danh sách tuyến khác
+  var others = document.getElementById("other-routes");
+  if (others) {
+    others.innerHTML = Object.keys(ROUTES).filter(function(k){return k!==slug;})
+      .map(function(k){ return '<a href="/gui-hang-di-'+k+'">'+esc(ROUTES[k].flag+" "+ROUTES[k].vi)+'</a>'; }).join("");
+  }
+})();
+</script>
+</body>
+</html>

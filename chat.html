@@ -71,8 +71,14 @@
   }
   document.getElementById("f").addEventListener("submit",function(e){ e.preventDefault(); send(input.value.trim()); });
   document.getElementById("staff-btn").onclick = openContact;
-  add("assistant","Dạ em chào anh/chị! Em là trợ lý VNGROW. Mình muốn gửi hàng đi nước nào, nặng khoảng bao nhiêu kg ạ?");
-  if(window.vgTrack)vgTrack("chat_page_view");
+  var toParam = new URLSearchParams(location.search).get("to");
+  if(toParam){
+    add("assistant","Dạ em chào anh/chị! Em là trợ lý VNGROW 🚚 Em hỗ trợ báo giá gửi hàng quốc tế ạ.");
+  } else {
+    add("assistant","Dạ em chào anh/chị! Em là trợ lý VNGROW. Mình muốn gửi hàng đi nước nào, nặng khoảng bao nhiêu kg ạ?");
+  }
+  if(window.vgTrack)vgTrack("chat_page_view",{to:toParam||""});
+  if(toParam){ send("Gửi hàng đi "+toParam); }
 })();
 </script>
 </body>

@@ -2,7 +2,8 @@
   "rewrites": [
     { "source": "/chat", "destination": "/chat.html" },
     { "source": "/chinh-sach", "destination": "/chinh-sach.html" },
-    { "source": "/((?!api/|chat|chinh-sach).*)", "destination": "/index.html" }
+    { "source": "/gui-hang-di-:slug", "destination": "/tuyen.html" },
+    { "source": "/((?!api/|chat|chinh-sach|gui-hang-di).*)", "destination": "/index.html" }
   ],
   "functions": { "api/chat.js": { "maxDuration": 30 } }
 }
