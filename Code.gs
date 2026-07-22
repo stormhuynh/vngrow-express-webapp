@@ -383,7 +383,109 @@ function saveLead(d) {
     d.chat_id || '',                 // chat_id
   ]);
 
+  notifyNewLead_({ id, ...d });
   return { id };
+}
+
+// ============================================================
+// TELEGRAM NOTIFICATIONS
+// Setup 1 lần: Project Settings > Script Properties, thêm 2 key:
+//   TELEGRAM_BOT_TOKEN  = token lấy từ @BotFather
+//   TELEGRAM_CHAT_ID    = id chat/group nhận thông báo
+// Cách lấy: xem docs/vngrow-automation-setup.md trong repo webapp.
+// ============================================================
+
+function sendTelegram_(text) {
+  const props = PropertiesService.getScriptProperties();
+  const token  = props.getProperty('TELEGRAM_BOT_TOKEN');
+  const chatId = props.getProperty('TELEGRAM_CHAT_ID');
+  if (!token || !chatId) return; // chưa cấu hình -> bỏ qua êm, không lỗi
+
+  try {
+    UrlFetchApp.fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+      muteHttpExceptions: true,
+    });
+  } catch (e) { /* không để lỗi Telegram làm hỏng luồng lưu lead */ }
+}
+
+// Báo ngay khi có lead mới từ chatbot AI.
+function notifyNewLead_(d) {
+  const lines = [
+    '🆕 <b>Lead mới từ AI chatbot</b>',
+    d.lead_name ? `👤 ${d.lead_name}` : null,
+    d.tel ? `📞 ${d.tel}` : null,
+    d.destination_country ? `🌍 Đi: ${d.destination_country}` : null,
+    d.cargo_description ? `📦 Hàng: ${d.cargo_description}` : null,
+    d.total_gw ? `⚖️ ${d.total_gw} kg` : null,
+    d.price_quote ? `💰 Giá tạm tính: ${Number(d.price_quote).toLocaleString('vi-VN')}đ` : null,
+    `📋 Trạng thái: ${d.rfq_status || d.lead_status || 'collecting'}`,
+  ].filter(Boolean);
+  sendTelegram_(lines.join('\n'));
+}
+
+// ============================================================
+// NHẮC LEAD BỊ BỎ QUÊN (chạy bằng Time-driven trigger, vd mỗi 3 tiếng)
+// Nhắc các lead vẫn ở trạng thái "collecting" quá 24h chưa có ai xử lý.
+// ============================================================
+
+function checkStaleLeads() {
+  const sheet = getCrmSheet('LEAD');
+  if (!sheet) return;
+
+  const [headers, ...rows] = sheet.getDataRange().getValues();
+  const col = name => headers.findIndex(h => String(h).trim().toLowerCase() === name);
+  const iStatus = col('lead_status'), iName = col('lead_name'), iTel = col('tel');
+  const iCreated = col('created_at'), iAssigned = col('assigned_to'), iSource = col('source');
+
+  const now = new Date();
+  const staleList = [];
+
+  rows.forEach(r => {
+    if (String(r[iStatus]).trim().toLowerCase() !== 'collecting') return;
+    if (iAssigned !== -1 && String(r[iAssigned]).trim() !== '') return; // đã có người nhận
+    const created = new Date(r[iCreated]);
+    if (isNaN(created)) return;
+    const hoursSince = (now - created) / 36e5;
+    if (hoursSince >= 24) {
+      staleList.push(`• ${r[iName] || '(chưa có tên)'} - ${r[iTel] || 'no SĐT'} (${Math.floor(hoursSince)}h chưa xử lý)`);
+    }
+  });
+
+  if (staleList.length) {
+    sendTelegram_(`⏰ <b>${staleList.length} lead chưa xử lý >24h</b>\n${staleList.join('\n')}`);
+  }
+}
+
+// ============================================================
+// NHẮC LỊCH ĐĂNG CONTENT (chạy bằng Time-driven trigger, mỗi ngày ~8h sáng)
+// Đọc tab CONTENT_CALENDAR trong spreadsheet CRM, cột:
+//   date | pillar | format | title | content | status
+// Nếu có dòng đúng ngày hôm nay và status != "Đã đăng" -> nhắc kèm nội dung.
+// ============================================================
+
+function checkContentToday() {
+  const sheet = getCrmSheet('CONTENT_CALENDAR');
+  if (!sheet) return; // chưa tạo tab -> bỏ qua êm
+
+  const [headers, ...rows] = sheet.getDataRange().getValues();
+  const col = name => headers.findIndex(h => String(h).trim().toLowerCase() === name);
+  const iDate = col('date'), iTitle = col('title'), iContent = col('content'), iStatus = col('status');
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  rows.forEach(r => {
+    const d = new Date(r[iDate]);
+    if (isNaN(d)) return;
+    d.setHours(0, 0, 0, 0);
+    if (d.getTime() !== today.getTime()) return;
+    if (String(r[iStatus]).trim() === 'Đã đăng') return;
+
+    sendTelegram_(`📅 <b>Hôm nay cần đăng:</b> ${r[iTitle] || ''}\n\n${r[iContent] || '(xem docs/vngrow-content-batch-01.md)'}`);
+  });
 }
 
 // ============================================================
