@@ -8,7 +8,7 @@
       Sự kiện sẽ đẩy đồng thời sang GA4 (gtag event) và FB Pixel (trackCustom).
    ===================================================================== */
 (function () {
-  var GA4_ID = "";       // vd: "G-XXXXXXXXXX"
+  var GA4_ID = "G-CW7PRZLP2H";  // GA4 VNGROW EXPRESS
   var FB_PIXEL_ID = "";  // vd: "1234567890123456"
 
   // ---- Google Analytics 4 ----
