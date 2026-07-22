@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VNGROW - Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand: #1878C8;
+      --navy: #0C3C70;
+      --accent: #F5A200;
+      --bg: #F4F7FB;
+      --ink: #111827;
+      --muted: #6B7280;
+      --line: #E5E7EB;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); }
+    
+    header { background: var(--navy); color: #fff; padding: 20px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    header a { color: #fff; text-decoration: none; font-size: 14px; opacity: 0.8; }
+    header a:hover { opacity: 1; }
+    
+    .container { max-width: 1000px; margin: 40px auto; display: grid; grid-template-columns: 1fr; gap: 32px; padding: 0 24px; }
+    
+    .card { background: #fff; border-radius: 16px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .card h2 { font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+    
+    .fld { margin-bottom: 20px; }
+    .fld label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .fld input, .fld select, .fld textarea { width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; font-family: inherit; transition: 0.2s; }
+    .fld input:focus, .fld select:focus, .fld textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(24,120,200,0.1); }
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    .btn { background: var(--brand); color: #fff; border: none; padding: 14px 24px; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+    .btn:hover { background: #125f9e; transform: translateY(-1px); }
+    .btn-orange { background: var(--accent); }
+    .btn-orange:hover { background: #E08A00; }
+    
+    .alert { padding: 16px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 24px; display: none; }
+    .alert.success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; display: block; }
+    .alert.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; display: block; }
+  
+  
+</style>
+</head>
+<body>
+
+  <header>
+    <h1>VNGROW CMS Dashboard</h1>
+    <a href="webpage.html" target="_blank">↗ Xem trang chủ</a>
+  </header>
+
+  <div class="container">
+    
+    <!-- KHU VỰC THÔNG BÁO -->
+    <div class="card">
+      <h2>📣 Đăng Thông Báo Mới</h2>
+      <div id="msg-notice" class="alert"></div>
+      <form id="formNotice" onsubmit="submitNotice(event)">
+        <div class="two-cols">
+          <div class="fld">
+            <label>Ngày (YYYY-MM-DD)</label>
+            <input type="date" id="n_date" required>
+          </div>
+          <div class="fld">
+            <label>Nhãn (Phân loại)</label>
+            <select id="n_tag" required>
+              <option value="Bảng giá">Bảng giá</option>
+              <option value="Phụ phí">Phụ phí</option>
+              <option value="Tip nghiệp vụ">Tip nghiệp vụ</option>
+              <option value="Thông báo">Thông báo chung</option>
+            </select>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Tiêu đề thông báo</label>
+          <input type="text" id="n_title" placeholder="VD: Cập nhật cước tuyến Mỹ..." required>
+        </div>
+        <div class="fld">
+          <label>Nội dung chi tiết</label>
+          <textarea id="n_content" rows="4" placeholder="Nhập nội dung thông báo..." required></textarea>
+        </div>
+        <div class="fld">
+          <label>Link đính kèm (Bảng giá PDF, bài viết... nếu có)</label>
+          <input type="url" id="n_link" placeholder="https://...">
+        </div>
+        <button type="submit" class="btn" id="btn-notice">🚀 Đăng thông báo</button>
+      </form>
+    </div>
+
+    
+    <!-- KHU VỰC TẠO TRANG NỘI DUNG (DYNAMIC PAGES) -->
+    <div class="card" style="border: 2px solid var(--brand);">
+      <h2>📝 Trình Tạo Trang Bài Viết (Chính sách, Hướng dẫn)</h2>
+      <div id="msg-page" class="alert"></div>
+      <form id="formPage" onsubmit="submitPage(event)">
+        <div class="two-cols">
+          <div class="fld">
+            <label>Tiêu đề trang</label>
+            <input type="text" id="p_title" placeholder="VD: Chính sách đền bù hàng hóa" required oninput="generateSlug()">
+          </div>
+          <div class="fld">
+            <label>Đường dẫn tĩnh (Slug)</label>
+            <input type="text" id="p_slug" placeholder="VD: chinh-sach-den-bu" required>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Nội dung bài viết</label>
+          <textarea id="p_content" rows="15" placeholder="Viết nội dung bài viết của bạn tại đây..."></textarea>
+        </div>
+        <button type="submit" class="btn" id="btn-page">💾 Đăng bài viết</button>
+      </form>
+      <div style="margin-top: 16px; font-size: 13px; color: var(--muted);">
+        <b>Ghi chú:</b> Sau khi đăng, bài viết sẽ có mặt tại link: <code>vngrow.com.vn/page.html?slug=tên-đường-dẫn</code>
+      </div>
+    </div>
+
+    <!-- KHU VỰC CÀI ĐẶT MẠNG XÃ HỘI -->
+    <div class="card">
+      <h2>⚙️ Cài Đặt Mã Nhúng (Mạng xã hội)</h2>
+      <div id="msg-settings" class="alert"></div>
+      <form id="formSettings" onsubmit="submitSettings(event)">
+        <div class="fld">
+          <label>Mã nhúng Facebook (iFrame)</label>
+          <textarea id="s_fb" rows="3" placeholder='<iframe src="https://www.facebook.com/plugins/page.php..."></iframe>'></textarea>
+        </div>
+        <div class="fld">
+          <label>Mã nhúng TikTok (iFrame)</label>
+          <textarea id="s_tk" rows="3" placeholder='<blockquote class="tiktok-embed"...'></textarea>
+        </div>
+        <button type="submit" class="btn btn-orange" id="btn-settings">💾 Lưu cài đặt</button>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // THAY THẾ BẰNG URL APPS SCRIPT CỦA DỰ ÁN
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSkj17nJRUxGjJHdkkTMjCR8zrKbRAn-qYmUZ2dt34C1ek5kBHHHb1gBuIjSrgbPT1mg/exec';
+
+    // Set default date to today
+    document.getElementById('n_date').valueAsDate = new Date();
+
+    function showMsg(id, type, text) {
+      const el = document.getElementById(id);
+      el.className = 'alert ' + type;
+      el.innerText = text;
+      setTimeout(() => { el.style.display = 'none'; el.className = 'alert'; }, 5000);
+    }
+
+    async function submitNotice(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-notice');
+      btn.innerText = 'Đang xử lý...'; btn.disabled = true;
+
+      const payload = {
+        action: 'saveNotice',
+        date: document.getElementById('n_date').value,
+        tag: document.getElementById('n_tag').value,
+        title: document.getElementById('n_title').value,
+        content: document.getElementById('n_content').value,
+        link: document.getElementById('n_link').value
+      };
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(data.status === 'success') {
+          showMsg('msg-notice', 'success', '✅ Đã đăng thông báo thành công!');
+          document.getElementById('formNotice').reset();
+          document.getElementById('n_date').valueAsDate = new Date();
+        } else {
+          showMsg('msg-notice', 'error', '❌ Lỗi: ' + data.message);
+        }
+      } catch (err) {
+        showMsg('msg-notice', 'error', '❌ Không thể kết nối đến máy chủ.');
+      }
+      btn.innerText = '🚀 Đăng thông báo'; btn.disabled = false;
+    }
+
+    async function submitSettings(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-settings');
+      btn.innerText = 'Đang lưu...'; btn.disabled = true;
+
+      const settings = [];
+      const fb = document.getElementById('s_fb').value;
+      const tk = document.getElementById('s_tk').value;
+      if(fb) settings.push({key: 'facebook_embed', value: fb});
+      if(tk) settings.push({key: 'tiktok_embed', value: tk});
+
+      const payload = {
+        action: 'saveSettings',
+        settings: settings
+      };
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(data.status === 'success') {
+          showMsg('msg-settings', 'success', '✅ Đã lưu cài đặt mạng xã hội!');
+        } else {
+          showMsg('msg-settings', 'error', '❌ Lỗi: ' + data.message);
+        }
+      } catch (err) {
+        showMsg('msg-settings', 'error', '❌ Không thể kết nối đến máy chủ.');
+      }
+      btn.innerText = '💾 Lưu cài đặt'; btn.disabled = false;
+    }
+  
+    
+      const contentHtml = tinymce.get('p_content').getContent();
+
+      
+      const payload = {
+        action: 'savePage',
+        title: document.getElementById('p_title').value,
+        slug: document.getElementById('p_slug').value,
+        content: contentHtml
+      };
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(data.status === 'success') {
+          showMsg('msg-page', 'success', '✅ ' + data.data);
+          // Optional: clear form
+          // document.getElementById('formPage').reset();
+          // quill.setContents([]);
+        } else {
+          showMsg('msg-page', 'error', '❌ Lỗi: ' + data.message);
+        }
+      } catch (err) {
+        showMsg('msg-page', 'error', '❌ Không thể kết nối đến máy chủ.');
+      }
+      btn.innerText = '💾 Đăng bài viết'; btn.disabled = false;
+    }
+
+</script>
+
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+</body>
+</html>

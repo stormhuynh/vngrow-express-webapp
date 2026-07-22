@@ -19,3 +19,9 @@ node_modules
 .env
 .vercel
 _t.mjs
+
+# --- Sibling projects (NOT part of the express webapp) ---
+/VNGROW-WEBAPP/
+/WEBAPP-FULLSTACK-LOG/
+*.zip
+.claude/

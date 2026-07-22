@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VNGROW EXPRESS — Bản mẫu Tối ưu Giao diện</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#1878C8; --brand-2:#2186D6; --navy:#0C3C70; --navy-2:#0A2E56;
+    --accent:#F5A200; --accent-d:#E08A00;
+    --ink:#14202E; --muted:#586b7e; --line:#E4EBF2;
+    --bg:#ffffff; --bg-soft:#F3F7FC; --bg-tint:#EAF3FB;
+    --ok:#2E7D32;
+    --shadow:0 10px 40px rgba(12,60,112,.10); --shadow-sm:0 2px 12px rgba(12,60,112,.08);
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:30px;padding:13px 24px;font-size:15px;border:0;cursor:pointer;transition:transform .15s,box-shadow .15s;white-space:nowrap}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 8px 22px rgba(245,162,0,.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(245,162,0,.45)}
+  .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+  .btn-ghost:hover{background:rgba(255,255,255,.2)}
+  .btn-outline{background:#fff;color:var(--brand);border:1.5px solid var(--brand)}
+  .eyebrow{font-size:12.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--brand)}
+
+  /* HEADER */
+  header.site{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .wrap{display:flex;align-items:center;gap:24px;height:64px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:20px;letter-spacing:.5px}
+  .logo .vn{color:var(--accent)} .logo .grow{color:var(--brand)}
+  .logo small{display:block;font-size:9px;font-weight:600;letter-spacing:2px;color:var(--muted)}
+  nav.main{display:flex;gap:24px;margin-left:14px}
+  nav.main a{font-size:14.5px;font-weight:600;color:var(--muted);transition:color .15s}
+  nav.main a:hover{color:var(--ink)}
+  header .cta{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .btn-sm{padding:9px 18px;font-size:14px}
+  @media(max-width:900px){nav.main{display:none}}
+
+  /* HERO */
+  .hero{position:relative;background:linear-gradient(160deg,var(--navy) 0%,var(--brand) 100%);color:#fff;overflow:hidden}
+  .hero svg.route{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none}
+  .hero .wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;padding:56px 24px 68px}
+  .hero .eyebrow{color:#8fd0ff}
+  .hero h1{font-size:44px;line-height:1.08;font-weight:900;letter-spacing:-1px;margin:16px 0 16px;text-wrap:balance}
+  .hero h1 .hl{color:var(--accent)}
+  .hero p.lead{font-size:17.5px;color:#dbeafe;max-width:34ch;margin-bottom:22px}
+  .hero .assure{display:flex;gap:18px;margin-top:8px;flex-wrap:wrap}
+  .hero .assure div{font-size:13.5px;color:#cfe4fb;display:flex;align-items:center;gap:7px}
+  .hero .assure b{color:#fff}
+
+  /* TOOL CARD */
+  .toolcard{background:#fff;border-radius:18px;box-shadow:0 30px 70px rgba(5,25,55,.45);overflow:hidden;color:var(--ink)}
+  .tooltabs{display:flex;background:#EEF3F8;padding:6px;gap:6px;overflow-x:auto}
+  .tooltab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;font-size:13.5px;font-weight:700;color:var(--muted);border-radius:11px;cursor:pointer;transition:.15s;border:0;background:transparent;white-space:nowrap}
+  .tooltab.active{background:#fff;color:var(--brand);box-shadow:var(--shadow-sm)}
+  .tooltab.chat.active{background:var(--brand);color:#fff}
+  .toolpanel{display:none;padding:16px}
+  .toolpanel.active{display:block}
+
+  /* chat panel */
+  .chatbody{background:#F5F8FB;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:9px;min-height:236px}
+  .chattop{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--brand);margin-bottom:4px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#57e08a;box-shadow:0 0 0 3px rgba(87,224,138,.25)}
+  .bub{max-width:84%;padding:9px 12px;border-radius:13px;font-size:13px;line-height:1.45}
+  .bub.u{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+  .bub.a{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+  .minitable{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px;font-size:11.5px;width:94%}
+  .minitable table{border-collapse:collapse;width:100%}
+  .minitable th,.minitable td{text-align:left;padding:4px 6px;border-bottom:1px solid #eef2f6}
+  .minitable th{color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase}
+  .minitable .best{color:var(--accent);font-weight:800}
+  .chatfoot{display:flex;gap:8px;margin-top:12px}
+  .chatfoot input{flex:1;border:1px solid var(--line);border-radius:20px;padding:10px 14px;font-size:13px;font-family:inherit;color:var(--muted)}
+  .chatfoot .send{background:var(--accent);color:#fff;border-radius:20px;padding:10px 18px;font-size:13.5px;font-weight:700;border:0;cursor:pointer}
+
+  /* form panels */
+  .fld{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+  .fld label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+  .fld input,.fld select,.fld textarea{border:1.5px solid var(--line);border-radius:9px;padding:11px 12px;font-size:14px;font-family:inherit;color:var(--ink);width:100%;background:#fff}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--brand)}
+  .fld textarea{resize:vertical;min-height:70px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .panel-cta{width:100%;justify-content:center;margin-top:4px}
+  .panelnote{font-size:12px;color:var(--muted);text-align:center;margin-top:9px}
+
+  /* SECTION */
+  section{padding:66px 0}
+  .sec-head{text-align:center;max-width:620px;margin:0 auto 40px}
+  .sec-head h2{font-size:32px;font-weight:900;letter-spacing:-.5px;margin:12px 0 12px;text-wrap:balance}
+  .sec-head p{color:var(--muted);font-size:16px}
+
+  /* TRUST STRIP */
+  .trust{background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .trust .wrap{display:flex;align-items:center;gap:26px;padding:20px 24px;flex-wrap:wrap;justify-content:center}
+  .trust .label{font-size:13px;font-weight:700;color:var(--muted)}
+  .carrier{font-weight:900;font-size:18px;color:#9fb2c4;letter-spacing:.5px}
+
+  /* ADVANTAGES */
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .adv{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;transition:transform .15s,box-shadow .15s}
+  .adv:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .adv .ic{width:44px;height:44px;border-radius:12px;background:var(--bg-tint);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:13px}
+  .adv h3{font-size:16.5px;font-weight:800;margin-bottom:6px}
+  .adv p{font-size:13.5px;color:var(--muted)}
+
+  /* POLICY / COMPENSATION SECTION */
+  .policy-section{background:var(--bg-tint);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .policy-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+  .policy-card{background:#fff;padding:24px;border-radius:12px;box-shadow:var(--shadow-sm);border-left:4px solid var(--ok)}
+  .policy-card.warning{border-left-color:var(--accent)}
+  .policy-card.info{border-left-color:var(--brand)}
+  .policy-card h3{font-size:16px;font-weight:800;margin-bottom:8px}
+  .policy-card p{font-size:14px;color:var(--muted)}
+
+  /* HARD GOODS */
+  .hard{background:var(--navy);color:#fff}
+  .hard .sec-head h2{color:#fff}.hard .eyebrow{color:#8fd0ff}
+  .hard .inner{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px}
+  .chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:8px 15px;font-size:13.5px;font-weight:600;color:#eaf3fb}
+  .chip b{color:var(--accent)}
+  .hardnote{background:rgba(255,255,255,.06);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:20px 22px}
+  .hardnote .q{font-size:16px;font-weight:700;line-height:1.5;margin-bottom:10px}
+  .hardnote .s{font-size:13.5px;color:#b9d3ec}
+
+  /* SHOWCASE (Social embeds) */
+  .showcase .grid-social{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .social-embed{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);padding:16px;text-align:center}
+  .social-embed h3{font-size:16px;margin-bottom:12px;color:var(--ink)}
+
+  /* UPDATES (Notice Board Timeline) */
+  .updates{background:var(--bg-soft)}
+  .notice-board{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;max-width:800px;margin:0 auto;box-shadow:var(--shadow-sm)}
+  .notice-item{display:flex;gap:20px;padding:20px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+  .notice-item:last-child{border-bottom:none;padding-bottom:0}
+  .notice-date{flex-shrink:0;text-align:center;background:var(--bg-tint);border-radius:12px;padding:12px 16px;min-width:80px}
+  .notice-date .day{font-size:24px;font-weight:900;color:var(--brand);line-height:1}
+  .notice-date .month{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:4px}
+  .notice-content h3{font-size:17px;font-weight:800;margin-bottom:8px;line-height:1.35;color:var(--ink)}
+  .notice-content p{font-size:14px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+  .utag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px}
+  .utag.price{background:#E8F5E9;color:#2E7D32}
+  .utag.fee{background:#FFF3E0;color:#E08A00}
+  .utag.tip{background:#F3E5F5;color:#8E24AA}
+
+  /* CTA BAND */
+  .cta-band{background:linear-gradient(135deg,var(--brand),var(--navy));color:#fff;border-radius:24px;padding:46px;text-align:center}
+  .cta-band h2{font-size:30px;font-weight:900;letter-spacing:-.5px;margin-bottom:12px;text-wrap:balance}
+  .cta-band p{color:#d3e6fa;font-size:16px;max-width:44ch;margin:0 auto 22px}
+
+  /* FOOTER */
+  footer.site{padding:40px 0 28px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;background:#fff}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  footer a:hover{color:var(--brand)}
+
+  @media(max-width:900px){
+    .hero .wrap{grid-template-columns:1fr;gap:32px;padding:40px 24px 52px}
+    .hero h1{font-size:34px}
+    .grid4, .policy-grid{grid-template-columns:1fr 1fr}
+    .hard .inner{grid-template-columns:1fr}
+    section{padding:48px 0}
+    .cta-band{padding:34px 22px}
+  }
+  @media(max-width:560px){
+    .grid4, .policy-grid, .showcase .grid-social{grid-template-columns:1fr}
+    .hero h1{font-size:29px}
+    .notice-item{flex-direction:column;gap:12px}
+    .notice-date{display:flex;align-items:center;gap:8px;padding:8px 12px;min-width:auto}
+    .notice-date .day{font-size:18px}
+    .notice-date .month{margin-top:0}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="#"><span><span class="vn">VN</span><span class="grow">GROW</span><small>EXPRESS FREIGHT</small></span></a>
+    <nav class="main">
+      <a href="#congcu">Công cụ</a>
+      <a href="#loithe">Vì sao VNGROW</a>
+      <a href="#chinhsach">Chính sách</a>
+      <a href="#hoatdong">Hoạt động</a>
+      <a href="#thongbao">Thông báo</a>
+    </nav>
+    <div class="cta"><a class="btn btn-primary btn-sm" href="#congcu">💬 Chat báo giá</a></div>
+  </div>
+</header>
+
+<!-- HERO + THANH CÔNG CỤ -->
+<div class="hero" id="congcu">
+  <svg class="route" viewBox="0 0 1120 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path d="M120,400 C360,180 760,180 1000,340" fill="none" stroke="#8fd0ff" stroke-width="2" stroke-dasharray="7 9" opacity=".7"/>
+    <circle cx="120" cy="400" r="7" fill="#F5A200"/><circle cx="120" cy="400" r="14" fill="none" stroke="#F5A200" stroke-opacity=".5"/>
+    <circle cx="1000" cy="340" r="7" fill="#57e08a"/><circle cx="1000" cy="340" r="14" fill="none" stroke="#57e08a" stroke-opacity=".5"/>
+  </svg>
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Chuyển phát nhanh quốc tế · Đại lý ủy quyền</span>
+      <h1>Gửi hàng gì<br>cũng hỏi <span class="hl">VNGROW</span></h1>
+      <p class="lead">Tra cước tự động, theo dõi hành trình 24/7 và gửi yêu cầu báo giá hàng khó ngay tại một trung tâm vận hành duy nhất.</p>
+      <div class="assure">
+        <div>🕐 <b>Báo giá 24/7</b></div>
+        <div>🔍 <b>Một giá cho tất cả</b></div>
+        <div>🧾 <b>Đủ hóa đơn VAT</b></div>
+      </div>
+    </div>
+
+    <!-- THANH CÔNG CỤ: 4 tab -->
+    <div class="toolcard">
+      <div class="tooltabs">
+        <button class="tooltab chat active" onclick="showTool('chat',this)">💬 Chat AI</button>
+        <button class="tooltab" onclick="showTool('quote',this)">💰 Tính cước</button>
+        <button class="tooltab" onclick="showTool('track',this)">📦 Tracking</button>
+        <button class="tooltab" onclick="showTool('rfq',this)">📋 Báo giá</button>
+      </div>
+
+      <div class="toolpanel active" id="tp-chat">
+        <div class="chatbody">
+          <div class="chattop"><span class="dot"></span> Trợ lý AI VNGROW · trả lời ngay</div>
+          <div class="bub a">Dạ em chào anh/chị! Mình gửi hàng đi nước nào, nặng bao nhiêu ạ?</div>
+          <div class="bub u">Gửi 5kg quần áo đi Mỹ</div>
+          <div class="minitable">
+            <table>
+              <tr><th>Hãng</th><th>Thời gian</th><th>Giá</th></tr>
+              <tr><td>Chuyên tuyến</td><td>7–10 ngày</td><td class="best">Tốt nhất</td></tr>
+              <tr><td>DHL</td><td>3–5 ngày</td><td>—</td></tr>
+              <tr><td>FedEx</td><td>4–6 ngày</td><td>—</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="chatfoot"><input value="Nhập tin nhắn…" readonly /><button class="send">Gửi</button></div>
+      </div>
+
+      <div class="toolpanel" id="tp-quote">
+        <div class="fld"><label>Quốc gia đến</label><input placeholder="VD: Mỹ, Anh, Úc..." readonly></div>
+        <div class="two">
+          <div class="fld"><label>Cân nặng (kg)</label><input placeholder="VD: 5" readonly></div>
+          <div class="fld"><label>Loại hàng</label><select><option>Hàng thường</option></select></div>
+        </div>
+        <button class="btn btn-primary panel-cta">So sánh giá các hãng →</button>
+        <div class="panelnote">Hệ thống sẽ lấy giá trực tiếp từ bảng cước VNGROW mới nhất.</div>
+      </div>
+
+      <div class="toolpanel" id="tp-track">
+        <div class="fld"><label>Mã vận đơn</label><input placeholder="VD: DHL-9283746" readonly></div>
+        <button class="btn btn-primary panel-cta">🔍 Tra cứu hành trình</button>
+        <div class="panelnote">Theo dõi lô hàng của bạn 24/7 theo thời gian thực</div>
+      </div>
+
+      <!-- Tab mới: Báo giá (RFQ) -->
+      <div class="toolpanel" id="tp-rfq">
+        <div class="fld"><label>Quốc gia gửi/đến</label><input placeholder="VD: Chiều về từ Đức" readonly></div>
+        <div class="fld"><label>Thông tin hàng hóa đặc biệt</label><textarea placeholder="VD: Máy móc quá khổ, thú cưng, hàng cần bảo quản lạnh..." readonly></textarea></div>
+        <button class="btn btn-primary panel-cta">Gửi Yêu Cầu Cho Chuyên Gia</button>
+        <div class="panelnote">Chuyên gia sẽ liên hệ tư vấn giải pháp và báo giá trong 15 phút.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TRUST -->
+<div class="trust">
+  <div class="wrap">
+    <span class="label">Đối tác vận chuyển uy tín:</span>
+    <span class="carrier" style="color:#D40511">DHL</span>
+    <span class="carrier" style="color:#4D148C">Fed<span style="color:#FF6600">Ex</span></span>
+    <span class="carrier" style="color:#FFB500">UPS</span>
+    <span class="carrier" style="color:#004B87">EMS</span>
+  </div>
+</div>
+
+<!-- ADVANTAGES -->
+<section id="loithe">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Vì sao chọn VNGROW</span>
+      <h2>Không phải rẻ nhất — mà rõ ràng &amp; an toàn nhất</h2>
+    </div>
+    <div class="grid4">
+      <div class="adv"><div class="ic">🔍</div><h3>Minh bạch, không phí ẩn</h3><p>Giá cao nói cao, rủi ro nói rủi ro. Báo trước mọi chi phí — không lùa khách.</p></div>
+      <div class="adv"><div class="ic">🧠</div><h3>Chuyên gia hàng khó</h3><p>Nghiệp vụ thật: MSDS, nhãn UN, FDA, đóng gói chuẩn. Hàng khó mấy cũng gửi đúng.</p></div>
+      <div class="adv"><div class="ic">🧾</div><h3>Đầy đủ hóa đơn VAT</h3><p>Mọi lô đều có hóa đơn — CTV, đại lý, doanh nghiệp yên tâm hạch toán.</p></div>
+      <div class="adv"><div class="ic">🤖</div><h3>AI báo giá 24/7</h3><p>Một giá cho tất cả, không cảm tính. Làm việc với hệ thống, không phải cá nhân.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHÍNH SÁCH & BỒI THƯỜNG -->
+<section class="policy-section" id="chinhsach">
+  <div class="wrap">
+    <div class="sec-head" style="margin-bottom: 30px;">
+      <span class="eyebrow">Cam kết Dịch vụ</span>
+      <h2>Chính sách Vận chuyển & Bồi thường</h2>
+      <p>Chúng tôi đặt sự an toàn của hàng hóa lên hàng đầu và bảo vệ quyền lợi của bạn bằng chính sách minh bạch.</p>
+    </div>
+    <div class="policy-grid">
+      <div class="policy-card info">
+        <h3>✅ Cam kết Bồi thường 100%</h3>
+        <p>Bồi thường 100% giá trị khai báo đối với hàng hóa bị thất lạc hoặc hư hỏng nặng do lỗi trong quá trình vận chuyển (có mua bảo hiểm hàng hóa).</p>
+      </div>
+      <div class="policy-card">
+        <h3>🔍 Hỗ trợ Khai báo Hải quan</h3>
+        <p>Miễn phí tư vấn và hỗ trợ làm các thủ tục giấy tờ cần thiết như FDA, MSDS, Invoice để đảm bảo hàng thông quan thuận lợi.</p>
+      </div>
+      <div class="policy-card warning">
+        <h3>⚠️ Hàng hóa Từ chối nhận</h3>
+        <p>VNGROW kiên quyết không nhận vận chuyển hàng cấm, chất nổ, vũ khí, hàng vi phạm sở hữu trí tuệ để đảm bảo an toàn cho mọi chuyến bay.</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 32px;">
+      <a href="#" class="btn btn-outline" style="border-radius: 8px;">Đọc chi tiết toàn bộ Chính sách →</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- HARD GOODS -->
+<section class="hard" id="hangkho">
+  <div class="wrap">
+    <div class="inner">
+      <div>
+        <span class="eyebrow">Chuyên môn khác biệt</span>
+        <h2 style="margin:12px 0 14px;font-size:30px;font-weight:900;letter-spacing:-.5px">Hàng người khác từ chối, VNGROW biết cách gửi</h2>
+        <p style="color:#c9dcef;font-size:15.5px;margin-bottom:8px">Phần lớn đơn vị chỉ biết làm hàng thường. Hàng đặc thù họ bảo "gửi đại" — rủi ro bị giữ, trả về. VNGROW làm đúng từ đầu.</p>
+        <div class="chips">
+          <span class="chip"><b>Hóa chất</b> · mẫu xét nghiệm</span>
+          <span class="chip"><b>Chất lỏng</b> · nước hoa</span>
+          <span class="chip"><b>Hàng có pin</b> · nam châm</span>
+          <span class="chip"><b>Máy móc</b> · giá trị cao</span>
+        </div>
+      </div>
+      <div class="hardnote">
+        <div class="q">"Chỗ khác bảo cứ gửi đại — hàng nằm lại mấy tháng. Quay lại VNGROW làm đúng MSDS + nhãn UN, hàng đi được."</div>
+        <div class="s">— Một lô mẫu nước thải công nghiệp gửi phòng lab tại Phần Lan.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWCASE (Mạng xã hội) -->
+<section class="showcase" id="hoatdong">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Hoạt động thực tế</span>
+      <h2>Cập nhật mỗi ngày trên Mạng Xã Hội</h2>
+      <p>Quy trình làm việc thật, đóng gói hàng thật. Đừng nghe chúng tôi nói, hãy xem chúng tôi làm.</p>
+    </div>
+    <div class="grid-social">
+      <!-- Facebook Embed Placeholder -->
+      <div class="social-embed">
+        <h3>📘 Fanpage VNGROW EXPRESS</h3>
+        <div style="background:var(--bg-tint); border:1px dashed var(--brand); border-radius: 8px; height: 350px; display:flex; align-items:center; justify-content:center; color:var(--brand); font-size:14px; flex-direction:column; gap:10px;">
+          <span style="font-size:30px">🟦</span>
+          [Khu vực nhúng iFrame Facebook Page Plugin]
+          <br>Hiển thị các bài đăng mới nhất
+        </div>
+      </div>
+      <!-- TikTok Embed Placeholder -->
+      <div class="social-embed">
+        <h3>🎵 Kênh TikTok VNGROW</h3>
+        <div style="background:#f4f4f4; border:1px dashed #000; border-radius: 8px; height: 350px; display:flex; align-items:center; justify-content:center; color:#000; font-size:14px; flex-direction:column; gap:10px;">
+          <span style="font-size:30px">📱</span>
+          [Khu vực nhúng iFrame TikTok Video]
+          <br>Hiển thị video hướng dẫn đóng gói
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UPDATES (Bảng tin thông báo) -->
+<section class="updates" id="thongbao">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Trung tâm Thông báo</span>
+      <h2>Bảng giá, Phụ phí & Thay đổi vận hành</h2>
+      <p>Cập nhật liên tục các thông tin quan trọng nhất ảnh hưởng đến lô hàng của bạn.</p>
+    </div>
+    
+    <div class="notice-board">
+      
+      <div class="notice-item">
+        <div class="notice-date">
+          <div class="day">20</div>
+          <div class="month">Tháng 07</div>
+        </div>
+        <div class="notice-content">
+          <span class="utag price">Bảng giá</span>
+          <h3>Cập nhật cước tuyến Mỹ & Canada tháng 07/2026</h3>
+          <p>Bảng cước ưu đãi mới nhất từ FedEx và DHL cho tuyến đi Bắc Mỹ. Cước phí giảm trung bình 5% so với tháng trước do biến động tỷ giá. Tải file PDF bên dưới.</p>
+          <a href="#" style="font-size: 13px; color: var(--brand); font-weight: 600;">⬇ Tải bảng giá PDF</a>
+        </div>
+      </div>
+
+      <div class="notice-item">
+        <div class="notice-date">
+          <div class="day">18</div>
+          <div class="month">Tháng 07</div>
+        </div>
+        <div class="notice-content">
+          <span class="utag fee">Phụ phí</span>
+          <h3>Thông báo thay đổi Phụ phí nhiên liệu (FSC) áp dụng từ 01/08</h3>
+          <p>Do sự biến động của giá dầu mỏ toàn cầu, hãng vận chuyển DHL thông báo điều chỉnh phụ phí nhiên liệu từ 24.5% lên 25.0%. Áp dụng cho mọi lô hàng booking sau ngày 01/08.</p>
+        </div>
+      </div>
+
+      <div class="notice-item">
+        <div class="notice-date">
+          <div class="day">15</div>
+          <div class="month">Tháng 07</div>
+        </div>
+        <div class="notice-content">
+          <span class="utag tip">Tip nghiệp vụ</span>
+          <h3>Gửi hàng có pin (Pin Lithium): Khai báo sao cho chuẩn?</h3>
+          <p>Hàng chứa pin rất dễ bị hải quan giam giữ nếu không khai báo đúng MSDS. VNGROW hướng dẫn chi tiết cách dán nhãn UN3481 và chuẩn bị tài liệu cho hàng điện tử.</p>
+          <a href="#" style="font-size: 13px; color: var(--brand); font-weight: 600;">Đọc tiếp →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Gửi hàng gì cũng hỏi VNGROW</h2>
+      <p>Báo giá minh bạch trong vài giây với trợ lý AI — miễn phí, 24/7.</p>
+      <a class="btn btn-primary" href="#congcu">💬 Chat báo giá ngay</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div><b style="color:var(--ink)">VNGROW EXPRESS</b> · Chuyển phát nhanh quốc tế<br>express.vngrow.com.vn</div>
+    <div style="display:flex;gap:20px"><a href="#">Chính sách</a><a href="#">Tracking</a><a href="#">Facebook</a><a href="#">TikTok</a></div>
+  </div>
+</footer>
+
+<script>
+  function showTool(id, btn){
+    document.querySelectorAll('.toolpanel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('tp-'+id).classList.add('active');
+    document.querySelectorAll('.tooltab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    // giữ style nổi bật riêng cho tab chat
+    document.querySelector('.tooltab.chat').classList.toggle('active', id==='chat');
+  }
+</script>
+</body>
+</html>
