@@ -1,7 +1,9 @@
 # VNGROW — Content Batch 01
 
-> Bám theo `vngrow-brand-strategy.md`. Luật cứng: không nêu giá tiền cụ thể, không hứa thời gian tuyệt đối, không "100%", ẩn danh khách, không cổ vũ gửi lụi, không chê đối thủ đích danh.
+> Bám theo `vngrow-brand-strategy.md`. Luật cứng: không nêu giá tiền cụ thể, không hứa thời gian tuyệt đối, không "100%", ẩn danh khách, không cổ vũ gửi lụi, không chê đối thủ đích danh, không gán case/dữ liệu của doanh nghiệp khác thành của VNGROW.
 > CTA mặc định dẫn về AI báo giá: **express.vngrow.com.vn/chat**
+>
+> **Trạng thái bằng chứng (xem `vngrow-trust-signals.md`):** Flagship 1 (Phần Lan) là case THẬT của VNGROW — đăng nguyên trạng. Flagship 2 & 3 hiện là bài **kiến thức chia sẻ** (chưa phải case thật của VNGROW) — giữ giọng "chuyên gia" nhưng không gắn mác case đã xảy ra, cho tới khi có lô hàng thật tương tự để thay vào.
 
 ---
 
@@ -55,13 +57,13 @@ Gửi hàng quốc tế — nhất là hàng khó — không phải cứ "nhét 
 
 ---
 
-### ⭐ Bài 2 — Nam châm & hàng có pin
+### ⭐ Bài 2 — Nam châm & hàng có pin (kiến thức chia sẻ)
 
 **Một cục nam châm nhỏ cũng đủ khiến cả lô hàng bị trả về.**
 
 Nhiều người bất ngờ khi biết: **nam châm, loa, động cơ, và hàng có pin** đều thuộc nhóm hàng đặc biệt trong vận chuyển hàng không. Từ trường và pin bị quản lý chặt theo quy định an toàn bay (IATA) — không phải cứ bỏ vào thùng là gửi được.
 
-Chuyện thường gặp: đơn vị vận chuyển không nắm quy định, hướng dẫn khách **"cứ gửi đại đi"**. Rủi ro là hãng bay soi ra → **giữ lại hoặc trả về cả lô**, khách mất thời gian và chi phí.
+Rủi ro thường gặp khi gửi không đúng cách: hãng bay soi ra → **giữ lại hoặc trả về cả lô**, mất thời gian và chi phí.
 
 Cách VNGROW làm ĐÚNG với hàng từ tính / có pin:
 ✔ Xác định đúng bản chất hàng và quy định của từng hãng/tuyến
@@ -76,7 +78,7 @@ Chúng tôi sẽ nói thẳng: hàng này gửi được hay không, đi tuyến
 
 ---
 
-### ⭐ Bài 3 — Thiết bị công nghệ & hàng giá trị cao
+### ⭐ Bài 3 — Thiết bị công nghệ & hàng giá trị cao (kiến thức chia sẻ)
 
 **Gửi thiết bị vài nghìn đô đi nước ngoài — sai một khâu là kẹt ở hải quan.**
 

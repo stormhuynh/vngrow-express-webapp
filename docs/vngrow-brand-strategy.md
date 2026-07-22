@@ -65,6 +65,7 @@ KHÔNG (luật cứng):
 4. KHÔNG nhận/khuyến khích hàng fake, hàng cấm, "gửi lụi/gửi đại" — chạm tới thì chuyển thành cảnh báo rủi ro.
 5. KHÔNG bịa số liệu, thống kê, tên khách thật.
 6. KHÔNG chê đối thủ đích danh (chỉ nói "nhiều đơn vị làm kiểu may rủi…").
+7. KHÔNG trình bày dữ liệu/case/khách hàng của doanh nghiệp khác như thể là của VNGROW — kể cả khi dữ liệu đó dùng để nghiên cứu thị trường nội bộ. Case công khai phải là chuyện thật của chính VNGROW; nếu chỉ là kiến thức ngành tổng hợp thì phải nói rõ là chia sẻ kiến thức, không gắn mác "case thật".
 
 ## 8. Content pillars
 
