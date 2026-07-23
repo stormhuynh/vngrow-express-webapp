@@ -108,7 +108,7 @@ function buildLeadPayload(input, ctx, sessionId) {
     channel: "web-ai",
     price_quote: merged.price_quote ?? "",
     lead_status: merged.rfq_status || "collecting",
-    note: merged.note || "",
+    note: [merged.dimensions ? `Kích thước: ${merged.dimensions}` : "", merged.note || ""].filter(Boolean).join(" - "),
   };
 }
 
@@ -198,6 +198,7 @@ export default async function handler(req, res) {
               total_vw: totalVw ? Math.round(totalVw * 100) / 100 : null,
               total_cw: cw,
               price_quote: best,
+              dimensions: pkgs.map(p => (p.L && p.W && p.H) ? `${p.qty||1} kiện ${p.L}x${p.W}x${p.H}cm` : "").filter(Boolean).join(", "),
             };
             out = { rows };
           } else if (c.name === "save_lead") {
