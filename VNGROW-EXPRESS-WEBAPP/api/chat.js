@@ -165,11 +165,15 @@ export default async function handler(req, res) {
     const { messages = [], sessionId = "" } = req.body || {};
     const convo = messages.map((m) => ({ role: m.role, content: m.content }));
     let quoted = false, table = null, leadCtx = {};
+    let accumulatedText = "";
 
     for (let i = 0; i < 6; i++) {
       const resp = await client.messages.create({
         model: MODEL, max_tokens: 1024, system: SYSTEM, tools, messages: convo,
       });
+
+      const currentText = resp.content.filter((c) => c.type === "text").map((c) => c.text).join("\n");
+      if (currentText) accumulatedText += (accumulatedText ? "\n\n" : "") + currentText;
 
       if (resp.stop_reason === "tool_use") {
         convo.push({ role: "assistant", content: resp.content });
@@ -214,7 +218,7 @@ export default async function handler(req, res) {
         continue;
       }
 
-      const text = stripTable(resp.content.filter((c) => c.type === "text").map((c) => c.text).join("\n"));
+      const text = stripTable(accumulatedText);
       const buttons = quoted
         ? [{ title: "Liên hệ nhân viên", payload: "CONTACT" }, { title: "Booking", payload: "BOOKING" }]
         : [];
