@@ -128,8 +128,9 @@ async function saveLead(input, ctx, sessionId) {
 function buildTable(rows, dest) {
   const served = rows.filter((r) => r.ok);
   const notServed = rows.filter((r) => !r.ok).map((r) => r.service_name);
+  const maxCw = Math.max(...served.map(r => r.cw || 0));
   return {
-    title: "Báo giá tạm tính đi " + dest,
+    title: "Báo giá tạm tính đi " + dest + (maxCw ? ` (Tính cước: ${maxCw}kg)` : ""),
     headers: ["Hãng", "Cước", "Phụ phí", "VAT", "Tổng"],
     rows: served.map((r) => [
       r.service_name, fmtVND(r.base),
