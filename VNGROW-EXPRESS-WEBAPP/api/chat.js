@@ -9,7 +9,7 @@ const MODEL = process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
 const SYSTEM = `Bạn là trợ lý báo giá của VNGROW - chuyển phát nhanh quốc tế từ Việt Nam đi nước ngoài. Xưng "em", gọi khách "anh/chị", lịch sự, chuyên nghiệp, NGẮN GỌN. Không đùa cợt quá đà.
 
 NHIỆM VỤ: thu thập thông tin rồi báo giá.
-Cần để báo giá: nước đến + cân nặng. Nên xin thêm KÍCH THƯỚC KIỆN và kho gửi để tính chính xác. Xin tên + SĐT để lưu hồ sơ, nhân viên hỗ trợ. Thiếu gì hỏi nấy, mỗi lượt tối đa 2 ý.
+Cần để báo giá: nước đến + cân nặng. Nên xin thêm KÍCH THƯỚC KIỆN và kho gửi để tính chính xác. Xin tên + SĐT để lưu hồ sơ, nhân viên hỗ trợ. KHÔNG chủ động xin email; chỉ xin email khi khách không cho SĐT mà muốn nhận báo giá/thông tin qua email. Thiếu gì hỏi nấy, mỗi lượt tối đa 2 ý.
 
 CÁCH HỎI KÍCH THƯỚC (quan trọng): hỏi để tính đúng, KHÔNG hỏi kiểu "có cồng kềnh không". Diễn đạt: "Anh/chị cho em xin kích thước kiện (dài × rộng × cao, cm) để em tính cước chính xác, tránh phát sinh do trọng lượng quy đổi nhé." Nếu khách không có/không rõ, cứ tính theo cân thực và nói rõ giá có thể đổi nhẹ nếu kiện to.
 
@@ -21,7 +21,7 @@ PHỤ PHÍ: chỉ nhắc phụ phí khi THỰC SỰ liên quan mặt hàng khác
 
 GIẢI THÍCH SỐ LIỆU (rất quan trọng): mọi con số (cước, phụ phí, VAT, tổng) đều do tool tính ra và là SỐ CHÍNH THỨC — KHÔNG tự tính lại, KHÔNG tự phủ nhận, KHÔNG mâu thuẫn giữa các lượt. Khi khách hỏi "phụ phí gồm gì / vì sao 10 triệu / cước gồm gì", hãy đọc mảng "addons" của hãng đó trong kết quả tool và liệt kê ĐÚNG từng khoản kèm số tiền, ví dụ: "Dạ phụ phí gồm: Phí quá khổ (kiện trên 68kg) 7.000.000đ + Phí kích thước (1 chiều trên 120cm) 700.000đ + Phí xử lý kho HCM 5.000đ ạ." TUYỆT ĐỐI KHÔNG nói "phụ phí = 0" khi tool có phụ phí, KHÔNG bịa "bảo hiểm/hải quan" nếu tool không có. Nếu addons rỗng thì phụ phí đúng bằng 0. Nếu khách hỏi khoản mà bạn không có dữ liệu, nói "để nhân viên xác nhận chi tiết" — đừng chế số.
 
-LƯU HỒ SƠ: khi có tên + SĐT hoặc vừa báo giá, gọi tool save_lead (kể cả khách chưa chốt).
+LƯU HỒ SƠ: khi có tên + SĐT hoặc vừa báo giá, gọi tool save_lead (kể cả khách chưa chốt). Điền ĐẦY ĐỦ các trường đã biết trong hội thoại: tên, SĐT (và email nếu khách cho), mô tả hàng, nước đến, kho gửi (HCM/HN), chiều (xuất/nhập), số kiện, tổng cân, giá tạm tính, và trạng thái phù hợp.
 
 KẾT THÚC lịch sự, không đùa: mời khách theo hướng "Anh/chị muốn liên hệ nhân viên để hỏi thêm không ạ? Hoặc anh/chị để lại số điện thoại, em nhờ nhân viên gọi lại tư vấn kỹ hơn." Rồi để 2 nút bên dưới.`;
 
@@ -53,31 +53,73 @@ const tools = [
   },
   {
     name: "save_lead",
-    description: "Ghi/cập nhật hồ sơ khách vào CRM. Gọi khi có thông tin mới hoặc sau khi báo giá.",
+    description: "Ghi/cập nhật hồ sơ khách (lead) vào CRM sheet LEAD. Gọi khi có thông tin mới hoặc sau khi báo giá. Điền đầy đủ mọi trường đã biết trong hội thoại.",
     input_schema: {
       type: "object",
       properties: {
-        chat_id: { type: "string" },
-        contact_name: { type: "string" },
-        contact_phone: { type: "string" },
-        destination_country: { type: "string" },
-        cargo_group: { type: "string" },
-        total_gw: { type: "number" },
-        price_quote: { type: "number" },
+        contact_name: { type: "string", description: "Tên khách" },
+        contact_phone: { type: "string", description: "SĐT khách" },
+        contact_email: { type: "string", description: "Email khách — CHỈ điền khi khách chủ động cung cấp, không tự bịa" },
+        cargo_description: { type: "string", description: "Mô tả hàng khách nói, vd 'quần áo', 'mỹ phẩm 5 hộp'" },
+        destination_country: { type: "string", description: "Nước đến" },
+        cargo_group: { type: "string", enum: ["normal", "cosmetics", "food", "electricity", "document", "plan", "other"] },
+        origin_city: { type: "string", enum: ["HCM", "HN"], description: "Kho gửi" },
+        direction: { type: "string", enum: ["export", "import"] },
+        total_packages: { type: "number", description: "Tổng số kiện" },
+        total_gw: { type: "number", description: "Tổng trọng lượng thực (kg)" },
+        cargo_value: { type: "number", description: "Giá trị lô hàng nếu khách khai" },
+        price_quote: { type: "number", description: "Giá tạm tính đã báo (VND, thường lấy mức thấp nhất)" },
         rfq_status: { type: "string", enum: ["collecting", "quoted", "booking_requested", "need_human"] },
+        note: { type: "string", description: "Ghi chú thêm cho nhân viên nếu cần" },
       },
       required: ["rfq_status"],
     },
   },
 ];
 
-async function saveLead(input) {
+// Bỏ các trường rỗng/null để không ghi đè giá trị AI đã cung cấp khi merge.
+function pruneEmpty(obj) {
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== null && v !== undefined && v !== "" && !(typeof v === "number" && isNaN(v))) out[k] = v;
+  }
+  return out;
+}
+
+// Chuẩn hoá input tool + ngữ cảnh lô hàng (ctx) thành payload đúng tên cột sheet LEAD.
+function buildLeadPayload(input, ctx, sessionId) {
+  const merged = { ...input, ...pruneEmpty(ctx) }; // ctx (số liệu tính từ code) thắng khi có
+  return {
+    action: "saveLead",
+    chat_id: sessionId,
+    lead_name: merged.contact_name || "",
+    tel: merged.contact_phone || "",
+    email: merged.contact_email || "",
+    cargo_description: merged.cargo_description || "",
+    destination_country: merged.destination_country || "",
+    total_packages: merged.total_packages ?? "",
+    total_gw: merged.total_gw ?? "",
+    total_vw: merged.total_vw ?? "",
+    total_cw: merged.total_cw ?? "",
+    origin_city: merged.origin_city || "",
+    cargo_value: merged.cargo_value ?? "",
+    currency: "VND",
+    source: "chatbot",
+    channel: "web-ai",
+    price_quote: merged.price_quote ?? "",
+    lead_status: merged.rfq_status || "collecting",
+    note: merged.note || "",
+  };
+}
+
+async function saveLead(input, ctx, sessionId) {
+  const payload = buildLeadPayload(input, ctx, sessionId);
   const url = process.env.LEAD_WEBHOOK_URL;
   if (!url) return { ok: true, note: "chưa cấu hình CRM webhook - bỏ qua" };
   try {
     const r = await fetch(url, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...input, rfq_date: new Date().toISOString().slice(0, 10) }),
+      body: JSON.stringify(payload),
     });
     return { ok: r.ok };
   } catch (e) { return { ok: false, error: String(e) }; }
@@ -118,7 +160,7 @@ export default async function handler(req, res) {
   try {
     const { messages = [], sessionId = "" } = req.body || {};
     const convo = messages.map((m) => ({ role: m.role, content: m.content }));
-    let quoted = false, table = null;
+    let quoted = false, table = null, leadCtx = {};
 
     for (let i = 0; i < 6; i++) {
       const resp = await client.messages.create({
@@ -134,10 +176,32 @@ export default async function handler(req, res) {
           if (c.name === "compare_carriers") {
             const rows = computeAllQuotes(c.input);
             table = buildTable(rows, c.input.destination_country);
-            if (rows.some((r) => r.ok)) quoted = true;
+            const served = rows.filter((r) => r.ok);
+            if (served.length) quoted = true;
+            // Bắt ngữ cảnh lô hàng từ số liệu tính bằng code (chính xác hơn để AI tự khai).
+            const pkgs = Array.isArray(c.input.packages) ? c.input.packages : [];
+            const totalGw = pkgs.reduce((a, p) => a + Number(p.weight || 0) * Number(p.qty || 1), 0);
+            const totalVw = pkgs.reduce((a, p) => {
+              const L = Number(p.L || 0), W = Number(p.W || 0), H = Number(p.H || 0);
+              return a + (L && W && H ? (L * W * H / 5000) * Number(p.qty || 1) : 0);
+            }, 0);
+            const totalPkgs = pkgs.reduce((a, p) => a + Number(p.qty || 1), 0);
+            const cw = served.length ? Math.max(...served.map((r) => Number(r.cw) || 0)) : null;
+            const best = served.length ? Math.min(...served.map((r) => Number(r.total))) : null;
+            leadCtx = {
+              destination_country: c.input.destination_country,
+              origin_city: c.input.origin_city,
+              direction: c.input.direction,
+              cargo_group: c.input.cargo_group,
+              total_packages: totalPkgs || null,
+              total_gw: totalGw ? Math.round(totalGw * 100) / 100 : null,
+              total_vw: totalVw ? Math.round(totalVw * 100) / 100 : null,
+              total_cw: cw,
+              price_quote: best,
+            };
             out = { rows };
           } else if (c.name === "save_lead") {
-            out = await saveLead({ chat_id: sessionId, ...c.input });
+            out = await saveLead(c.input, leadCtx, sessionId);
           } else { out = { ok: false, error: "unknown tool" }; }
           results.push({ type: "tool_result", tool_use_id: c.id, content: JSON.stringify(out) });
         }
